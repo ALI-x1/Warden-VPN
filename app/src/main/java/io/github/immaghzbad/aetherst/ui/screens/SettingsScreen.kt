@@ -308,20 +308,6 @@ fun SettingsScreen(
                                 onOptionSelected = { onUpdateConfig(config.copy(coreLogLevel = AetherLogLevel.entries[it])) },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText, sheetBg = groupBg
                             )
-                            HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
-                            IosPresetItem(
-                                icon = Icons.Default.Code, iconBg = Color(0xFF34C759),
-                                title = "Application Logs", subtitle = "View connection and system logs",
-                                isActive = false, onClick = onOpenLogs, scaleFactor = scaleFactor,
-                                textColor = primaryText, subTextColor = secondaryText
-                            )
-                            HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
-                            IosPresetItem(
-                                icon = Icons.Default.Info, iconBg = Color(0xFF8E8E93),
-                                title = "About Us", subtitle = "Version, license, and information",
-                                isActive = false, onClick = onOpenAbout, scaleFactor = scaleFactor,
-                                textColor = primaryText, subTextColor = secondaryText
-                            )
                         }
                     }
                 }
@@ -371,6 +357,30 @@ fun SettingsScreen(
                             testTag = "switch_battery_opt", scaleFactor = scaleFactor,
                             textColor = primaryText, subTextColor = secondaryText
                         )
+                    }
+                }
+            }
+
+            // Application Logs & About Us (Moved to Bottom)
+            if (searchQuery.isEmpty() || "Application Logs System About Us Version".contains(searchQuery, ignoreCase = true)) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    IosGroupCard(cardBg = cardBg) {
+                        Column {
+                            IosPresetItem(
+                                icon = Icons.Default.Code, iconBg = Color(0xFF34C759),
+                                title = "Application Logs", subtitle = "View connection and system logs",
+                                isActive = false, onClick = onOpenLogs, scaleFactor = scaleFactor,
+                                textColor = primaryText, subTextColor = secondaryText
+                            )
+                            HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
+                            IosPresetItem(
+                                icon = Icons.Default.Info, iconBg = Color(0xFF8E8E93),
+                                title = "About Us", subtitle = "Version, license, and information",
+                                isActive = false, onClick = onOpenAbout, scaleFactor = scaleFactor,
+                                textColor = primaryText, subTextColor = secondaryText
+                            )
+                        }
                     }
                 }
             }
