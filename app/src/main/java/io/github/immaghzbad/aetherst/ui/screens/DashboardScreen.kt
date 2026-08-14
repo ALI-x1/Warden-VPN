@@ -686,7 +686,13 @@ fun WardenPowerButton(
     )
 
     // رنگ لیکویید گلس (سازگار با تم‌های متریال ۳)
-    val glassBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.45f)
+    // سنجش هوشمند روشنایی تم متریال ۳
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+
+val glassBgColor = MaterialTheme.colorScheme.surface.copy(
+    alpha = if (isDark) 0.45f else 0.08f
+)
+
     val glassBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
 
     // مقیاس‌بندی ابعاد بر اساس فایل HTML
