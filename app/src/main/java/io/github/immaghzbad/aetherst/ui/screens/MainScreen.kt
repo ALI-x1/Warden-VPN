@@ -62,6 +62,7 @@ import io.github.immaghzbad.aetherst.ui.AetherViewModel
 import io.github.immaghzbad.aetherst.ui.OnboardingViewModel
 import io.github.immaghzbad.aetherst.ui.components.IosToast
 import io.github.immaghzbad.aetherst.ui.theme.ThemeSelectionScreen
+import io.github.immaghzbad.aetherst.ui.theme.ThemeManager
 
 private tailrec fun Context.findComponentActivity(): ComponentActivity? = when (this) {
     is ComponentActivity -> this
@@ -93,6 +94,7 @@ fun MainScreen(viewModel: AetherViewModel) {
     val onboardingState by onboardingViewModel.state.collectAsStateWithLifecycle()
     val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
     val crashLog by viewModel.crashLog.collectAsStateWithLifecycle()
+    val isDarkTheme = ThemeManager.currentTheme.isDark
     val currentStep by rememberUpdatedState(onboardingState.currentStep)
 
     DisposableEffect(lifecycleOwner) {
