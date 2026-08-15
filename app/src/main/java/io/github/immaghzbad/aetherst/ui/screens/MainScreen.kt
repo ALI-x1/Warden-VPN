@@ -94,7 +94,6 @@ fun MainScreen(viewModel: AetherViewModel) {
     val onboardingState by onboardingViewModel.state.collectAsStateWithLifecycle()
     val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
     val crashLog by viewModel.crashLog.collectAsStateWithLifecycle()
-    val isDarkTheme = ThemeManager.currentTheme.isDark
     val currentStep by rememberUpdatedState(onboardingState.currentStep)
 
     DisposableEffect(lifecycleOwner) {
@@ -214,6 +213,9 @@ private fun DashboardContent(viewModel: AetherViewModel) {
     val isOptimizingMtu by viewModel.isOptimizingMtu.collectAsStateWithLifecycle()
     val isWaitingForLoginCode by viewModel.isWaitingForLoginCode.collectAsStateWithLifecycle()
     val scrollToZeroTrust by viewModel.scrollToZeroTrust.collectAsStateWithLifecycle()
+    
+    // تعریف isDarkTheme در اینجا تا به درستی درون DashboardScreen شناخته شود
+    val isDarkTheme = ThemeManager.currentTheme.isDark
 
     LaunchedEffect(scrollToZeroTrust) {
         if (scrollToZeroTrust) {
