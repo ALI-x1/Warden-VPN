@@ -1,69 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <string name="app_name">Warden Vpn</string>
+    <!-- ترجمه کلیدهای اصلی پروژه -->
+    <string name="app_name">Warden Vpn</string>
     <string name="widget_title">Warden Vpn</string>
     <string name="widget_status_disconnected">قطع شده</string>
     <string name="widget_button_desc">تغییر وضعیت اتصال</string>
     <string name="proto_masque">MASQUE</string>
     <string name="proto_wire">WIRE</string>
     <string name="proto_gool">GOOL</string>
-        <!-- Settings Screen -->
-    <string name="settings_title">تنظیمات</string>
-    <string name="settings_subtitle">پیکربندی هسته و پروتکل‌های انتقال</string>
-    <string name="search_settings">جستجو در تنظیمات...</string>
-    <string name="appearance_language">ظاهر و زبان</string>
-    <string name="themes">پوسته‌ها</string>
-    <string name="themes_subtitle">شخصی‌سازی ظاهر برنامه</string>
-    <string name="language_title">زبان برنامه / Language</string>
-    
-    <string name="configuration">پیکربندی</string>
-    <string name="preset_profiles">پروفایل‌های آماده</string>
-    <string name="preset_profiles_subtitle">انتخاب پیکربندی‌های پیش‌فرض</string>
-    <string name="connection_routing">اتصال و مسیریابی</string>
-    <string name="connection_routing_subtitle">هسته، پروتکل‌ها و انتقال</string>
-    <string name="cloudflare_zt">کلودفلر زیروتراست (Zero Trust)</string>
-    <string name="cloudflare_zt_subtitle">تنظیمات سازمان و دسترسی</string>
-    <string name="advanced_security">امنیت پیشرفته</string>
-    <string name="advanced_security_subtitle">سوئیچ قطع (Kill Switch) و بازیابی خودکار</string>
-    
-    <string name="app_settings_diagnostics">تنظیمات برنامه و عیب‌یابی</string>
-    <string name="app_system_logging">گزارش‌گیری سیستم</string>
-    <string name="aether_core_logging">گزارش‌گیری هسته Aether</string>
-    
-    <string name="backup_maintenance">پشتیبان‌گیری و نگهداری</string>
-    <string name="full_backup">تهیه نسخه پشتیبان کامل</string>
-    <string name="full_backup_subtitle">خروجی گرفتن از تمام تنظیمات (.astf)</string>
-    <string name="restore_backup">بازیابی از نسخه پشتیبان</string>
-    <string name="restore_backup_subtitle">وارد کردن تنظیمات از فایل .astf</string>
-    <string name="reset_defaults">بازگشت به تنظیمات کارخانه</string>
-    <string name="reset_defaults_subtitle">پاک کردن تمام تغییرات و شروع دوباره</string>
-    
-    <string name="system_stability">پایداری سیستم</string>
-    <string name="battery_optimization">بهینه‌سازی باتری</string>
-    <string name="battery_opt_subtitle">اجازه فعالیت در پس‌زمینه بدون محدودیت</string>
-    
-    <string name="application_logs">گزارشات برنامه (Logs)</string>
-    <string name="app_logs_subtitle">مشاهده لاگ‌های اتصال و سیستم</string>
-    <string name="about_us">درباره ما</string>
-    <string name="about_us_subtitle">نسخه، لایسنس و اطلاعات</string>
-    
-    <!-- Dialogs & Popups -->
-    <string name="lang_system_default">پیش‌فرض سیستم</string>
-    <string name="lang_sys_sub">زبان هماهنگ با گوشی</string>
-    <string name="lang_english">انگلیسی</string>
-    <string name="lang_persian">فارسی</string>
-    
-    <string name="cancel">لغو</string>
-    <string name="reset_title">بازنشانی تمام تنظیمات؟</string>
-    <string name="reset_message">این کار تمام پروتکل‌ها، تغییرات هسته و تنظیمات امنیتی را به حالت اولیه برمی‌گرداند. این عمل قابل بازگشت نیست.</string>
-    <string name="reset_everything">بازنشانی کامل</string>
 
-    <!-- Toasts -->
-    <string name="toast_applied_manual">تنظیمات دستی اعمال شد</string>
-    <string name="toast_applied_udp">دور زدن UDP/TLS اعمال شد</string>
-    <string name="toast_applied_stealth">حالت مخفیانه آهنین اعمال شد</string>
-    <string name="toast_applied_turbo">حالت سرعت توربو اعمال شد</string>
-    <string name="toast_ip_copied">آدرس آی‌پی کپی شد!</string>
-    <string name="toast_system_restored">سیستم به حالت پیش‌فرض بازگشت</string>
-        
+    <!-- ترجمه کلیدهای بخش زبان -->
+    <string name="language_title">زبان برنامه</string>
+    <string name="language_system">پیش‌فرض سیستم</string>
+    <string name="language_english">English</string>
+    <string name="language_persian">فارسی</string>
 </resources>
