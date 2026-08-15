@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
@@ -76,7 +77,6 @@ fun DashboardScreen(
         }
     }
 
-    // انیمیشن نرم برای تغییر رنگ پس‌زمینه اصلی صفحه هنگام تغییر تم
     val htmlDashboardBg by animateColorAsState(
         targetValue = MaterialTheme.colorScheme.background,
         animationSpec = tween(700, easing = LinearOutSlowInEasing),
@@ -95,16 +95,18 @@ fun DashboardScreen(
         val isVeryCompactHeight = screenHeight < 580.dp
         val horizontalPadding = if (screenWidth < 360.dp) 12.dp else 16.dp
 
-        // انیمیشن سه‌بعدی و جذاب برای سوئیچ شدن کل محتوای صفحه بین تم تاریک و روشن
+        // انیمیشن تغییر تم شبیه تلگرام (Circular Reveal از گوشه بالا سمت راست)
         AnimatedContent(
             targetState = isDarkTheme,
             transitionSpec = {
-                (fadeIn(animationSpec = tween(600, easing = LinearOutSlowInEasing)) +
-                 scaleIn(initialScale = 0.94f, animationSpec = tween(600, easing = FastOutSlowInEasing)))
-                    .togetherWith(
-                        fadeOut(animationSpec = tween(400)) +
-                        scaleOut(targetScale = 1.04f, animationSpec = tween(400, easing = FastOutSlowInEasing))
-                    )
+                (fadeIn(animationSpec = tween(500, easing = LinearOutSlowInEasing)) +
+                 scaleIn(
+                     initialScale = 0.05f, 
+                     transformOrigin = TransformOrigin(1f, 0f), // نقطه شروع از گوشه آیکون تم
+                     animationSpec = tween(600, easing = FastOutSlowInEasing)
+                 )) togetherWith (
+                     fadeOut(animationSpec = tween(400))
+                 )
             },
             label = "theme_screen_transition",
             modifier = Modifier.fillMaxSize()
@@ -150,7 +152,7 @@ fun DashboardScreen(
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             
-                            // دکمه تغییر تم پیشرفته
+                            // دکمه تغییر تم با هاله نرم
                             ThemeToggleButton(
                                 isDarkTheme = isDarkTheme,
                                 onToggleTheme = onToggleTheme,
@@ -174,10 +176,16 @@ fun DashboardScreen(
                                 Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                             }
                             
-                            // دکمه تنظیمات ارتقا یافته با هاله و انیمیشن
+                            // دکمه تنظیمات با هاله محو شونده
                             val themeColor = MaterialTheme.colorScheme.primary
                             val settingsRotation = remember { Animatable(0f) }
                             val scope = rememberCoroutineScope()
+                            
+                            val settingsHaloBrush = remember(themeColor) {
+                                Brush.radialGradient(
+                                    colors = listOf(themeColor.copy(alpha = 0.25f), Color.Transparent)
+                                )
+                            }
                             
                             IconButton(
                                 onClick = {
@@ -191,16 +199,15 @@ fun DashboardScreen(
                                 },
                                 modifier = Modifier
                                     .size((36 * scaleFactor).dp)
-                                    .clip(CircleShape)
-                                    .background(themeColor.copy(alpha = 0.15f)) // هاله هماهنگ با تم
+                                    .background(settingsHaloBrush) // استفاده از براش شعاعی بدون لبه تیز
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
                                     contentDescription = "Settings",
-                                    tint = themeColor, // رنگ هماهنگ با تم
+                                    tint = themeColor,
                                     modifier = Modifier
                                         .size((22 * scaleFactor).dp)
-                                        .rotate(settingsRotation.value) // انیمیشن چرخش جذاب
+                                        .rotate(settingsRotation.value)
                                 )
                             }
                         }
@@ -331,9 +338,6 @@ fun DashboardScreen(
     }
 }
 
-/**
- * دکمه تغییر تم پیشرفته با انیمیشن‌های نرم و هلال ماه کاملاً بی‌نقص
- */
 @Composable
 fun ThemeToggleButton(
     isDarkTheme: Boolean,
@@ -341,7 +345,11 @@ fun ThemeToggleButton(
     scaleFactor: Float
 ) {
     val themeColor = MaterialTheme.colorScheme.primary
-    val containerBg = themeColor.copy(alpha = 0.15f) // هماهنگی هاله بک‌گراند با آیکون تنظیمات
+    val themeHaloBrush = remember(themeColor) {
+        Brush.radialGradient(
+            colors = listOf(themeColor.copy(alpha = 0.25f), Color.Transparent)
+        )
+    }
 
     val sunAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 0f else 1f, animationSpec = tween(400), label = "sunAlpha")
     val sunScale by animateFloatAsState(targetValue = if (isDarkTheme) 0.3f else 1f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunScale")
@@ -353,14 +361,12 @@ fun ThemeToggleButton(
         onClick = onToggleTheme,
         modifier = Modifier
             .size((36 * scaleFactor).dp)
-            .clip(CircleShape)
-            .background(containerBg)
+            .background(themeHaloBrush) // استفاده از براش شعاعی بدون لبه تیز
     ) {
         Box(contentAlignment = Alignment.Center) {
             Canvas(modifier = Modifier.size((22 * scaleFactor).dp)) {
                 val center = Offset(size.width / 2f, size.height / 2f)
                 
-                // ترسیم خورشید (هنگام تم روشن)
                 if (!isDarkTheme || sunAlpha > 0f) {
                     for (angle in 0 until 360 step 45) {
                         rotate(angle.toFloat(), center) {
@@ -381,16 +387,13 @@ fun ThemeToggleButton(
                     )
                 }
 
-                // ترسیم هلال ماه بی‌نقص (هنگام تم تاریک)
                 if (isDarkTheme || moonAlpha > 0f) {
                     val moonRadius = 7.dp.toPx() * moonScale
                     
-                    // دایره اصلی ماه
                     val path1 = Path().apply {
                         addOval(Rect(center.x - moonRadius, center.y - moonRadius, center.x + moonRadius, center.y + moonRadius))
                     }
                     
-                    // دایره‌ای که نقش ماسک را دارد (برای بریدن هلال)
                     val maskOffset = 3.5.dp.toPx() * moonScale
                     val path2 = Path().apply {
                         addOval(Rect(
@@ -401,7 +404,6 @@ fun ThemeToggleButton(
                         ))
                     }
                     
-                    // ترکیب دو دایره برای ایجاد یک هلال تمیز (برش واقعی)
                     val crescentPath = Path().apply {
                         op(path1, path2, PathOperation.Difference)
                     }
@@ -834,6 +836,15 @@ fun WardenPowerButton(
         animationSpec = infiniteRepeatable(tween(750, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "iconScale"
     )
+    
+    // ضربان بسیار نرم هنگام اتصال
+    val heartbeatPulse by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = if (isRunning) 1.03f else 1f,
+        animationSpec = infiniteRepeatable(tween(1000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "heartbeat"
+    )
+    
     val iconAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = if (isConnecting) 0.6f else 1f,
@@ -935,6 +946,10 @@ fun WardenPowerButton(
             Box(
                 modifier = Modifier
                     .size(coreRingSize)
+                    .graphicsLayer {
+                        scaleX = heartbeatPulse // اعمال ضربان هنگام اتصال
+                        scaleY = heartbeatPulse
+                    }
                     .clip(CircleShape)
                     .background(cBg)
                     .border(3.dp, cRing, CircleShape)
