@@ -1,4 +1,4 @@
-package io.github.immaghzbad.aetherst.ui.screens
+package io.github.aliz.aetherst.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -40,10 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.immaghzbad.aetherst.data.IpInfo
-import io.github.immaghzbad.aetherst.data.PingState
-import io.github.immaghzbad.aetherst.model.*
-import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
+import io.github.aliz.aetherst.data.IpInfo
+import io.github.aliz.aetherst.data.PingState
+import io.github.aliz.aetherst.model.*
+import io.github.aliz.aetherst.ui.theme.LocalAppTheme
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -55,6 +55,8 @@ fun DashboardScreen(
     sessionTraffic: SessionTraffic,
     ipInfo: IpInfo = IpInfo(),
     pingState: PingState = PingState(),
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
     onToggleVpn: () -> Unit,
     onUpdateProtocol: (AetherProtocol) -> Unit,
     onOpenSettings: () -> Unit = {},
@@ -71,7 +73,6 @@ fun DashboardScreen(
         }
     }
 
-    // استفاده از رنگ‌های متریال ۳ برای هماهنگی کامل با تغییر تم داخل اپلیکیشن
     val htmlDashboardBg = MaterialTheme.colorScheme.background
     val htmlOnDashboardBg = MaterialTheme.colorScheme.onBackground
 
@@ -110,7 +111,7 @@ fun DashboardScreen(
                 ) {
                     Column {
                         Text(
-                            text = "Warden VPN",
+                            text = "ALIZ",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = htmlOnDashboardBg,
@@ -126,6 +127,16 @@ fun DashboardScreen(
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        
+                        // دکمه تغییر تم (خورشید و ماه) دقیقاً با منطق HTML
+                        ThemeToggleButton(
+                            isDarkTheme = isDarkTheme,
+                            onToggleTheme = onToggleTheme,
+                            scaleFactor = scaleFactor
+                        )
+
+                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+
                         if (config.connectionMode == ConnectionMode.PROXY_ONLY && connectionStatus == ConnectionStatus.RUNNING) {
                             IconButton(
                                 onClick = { showProxyOverlay = true },
@@ -154,7 +165,7 @@ fun DashboardScreen(
                     }
                 }
 
-                WardenStatusHeroCard(
+                AlizStatusHeroCard(
                     connectionStatus = connectionStatus,
                     elapsedSeconds = elapsedSeconds,
                     sessionTraffic = sessionTraffic,
@@ -204,7 +215,7 @@ fun DashboardScreen(
                 val minDim = if (screenWidth < screenHeight) screenWidth else screenHeight
                 val buttonWrapSize = (minDim * 0.75f).coerceIn(250.dp, 350.dp)
                 
-                WardenPowerButton(
+                AlizPowerButton(
                     connectionStatus = connectionStatus,
                     onToggle = onToggleVpn,
                     wrapSize = buttonWrapSize
@@ -217,7 +228,7 @@ fun DashboardScreen(
                         .fillMaxWidth()
                         .padding(bottom = 4.dp)
                 ) {
-                    WardenProtocolSegmentedControl(
+                    AlizProtocolSegmentedControl(
                         selectedProtocol = config.protocol,
                         onProtocolSelected = onUpdateProtocol,
                         enabled = connectionStatus == ConnectionStatus.STOPPED || connectionStatus == ConnectionStatus.ERROR,
@@ -273,6 +284,56 @@ fun DashboardScreen(
                     onShowToast("Address copied: $it", false)
                 },
                 scaleFactor = scaleFactor
+            )
+        }
+    }
+}
+
+@Composable
+fun ThemeToggleButton(
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit,
+    scaleFactor: Float
+) {
+    // پیاده‌سازی انیمیشن دقیق مشابه پروتوتایپ HTML (Scale, Rotation, Alpha)
+    val sunAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 0f else 1f, animationSpec = tween(400), label = "sunAlpha")
+    val sunScale by animateFloatAsState(targetValue = if (isDarkTheme) 0.3f else 1f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunScale")
+    val sunRotate by animateFloatAsState(targetValue = if (isDarkTheme) 90f else 0f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunRotate")
+
+    val moonAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0f, animationSpec = tween(400), label = "moonAlpha")
+    val moonScale by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0.3f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonScale")
+    val moonRotate by animateFloatAsState(targetValue = if (isDarkTheme) 0f else -90f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonRotate")
+
+    IconButton(
+        onClick = onToggleTheme,
+        modifier = Modifier.size((36 * scaleFactor).dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Default.WbSunny,
+                contentDescription = "Light Mode",
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                modifier = Modifier
+                    .size((24 * scaleFactor).dp)
+                    .graphicsLayer {
+                        alpha = sunAlpha
+                        scaleX = sunScale
+                        scaleY = sunScale
+                        rotationZ = sunRotate
+                    }
+            )
+            Icon(
+                imageVector = Icons.Default.DarkMode,
+                contentDescription = "Dark Mode",
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                modifier = Modifier
+                    .size((24 * scaleFactor).dp)
+                    .graphicsLayer {
+                        alpha = moonAlpha
+                        scaleX = moonScale
+                        scaleY = moonScale
+                        rotationZ = moonRotate
+                    }
             )
         }
     }
@@ -364,7 +425,7 @@ private fun ProxyCopyRow(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WardenStatusHeroCard(
+fun AlizStatusHeroCard(
     connectionStatus: ConnectionStatus,
     elapsedSeconds: Long,
     sessionTraffic: SessionTraffic,
@@ -631,12 +692,8 @@ fun WardenStatusHeroCard(
     }
 }
 
-/**
- * WardenPowerButton - 1000% Exact Match HTML Edition
- * Orbital Tracer, Liquid Glass, Touch Pad Ripple, Vibrant Glow (Fixed with requested exact colors)
- */
 @Composable
-fun WardenPowerButton(
+fun AlizPowerButton(
     connectionStatus: ConnectionStatus,
     onToggle: () -> Unit,
     wrapSize: Dp
@@ -650,11 +707,10 @@ fun WardenPowerButton(
     val appTheme = LocalAppTheme.current
     val baseThemeColor = MaterialTheme.colorScheme.primary
 
-    // ۱. رنگ حلقه‌ها بر اساس وضعیت
     val cRing by animateColorAsState(
         targetValue = when {
-            isRunning -> Color(0xFF10B981) // سبز متصل
-            isConnecting -> Color(0xFFF59E0B) // زرد در حال اتصال
+            isRunning -> Color(0xFF10B981)
+            isConnecting -> Color(0xFFF59E0B)
             isError -> appTheme.error
             else -> baseThemeColor
         },
@@ -662,7 +718,6 @@ fun WardenPowerButton(
         label = "cRing"
     )
 
-    // ۲. رنگ هاله (Glow) به صورت دقیق: حالت خاموش = رنگ تم، حال اتصال = زرد، متصل = سبز (با وضوح بالا)
     val cGlow by animateColorAsState(
         targetValue = when {
             isRunning -> Color(0xFF10B981).copy(alpha = 0.85f)
@@ -685,14 +740,9 @@ fun WardenPowerButton(
         label = "cBg"
     )
 
-    // رنگ لیکویید گلس (سازگار با تم‌های متریال ۳)
-    // سنجش هوشمند روشنایی تم متریال ۳
-
     val glassBgColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.50f)
-
     val glassBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
 
-    // مقیاس‌بندی ابعاد بر اساس فایل HTML
     val glowSize = wrapSize * 1.125f     
     val glassSize = wrapSize * 0.875f    
     val spinRingSize = wrapSize * 0.8375f 
@@ -713,14 +763,12 @@ fun WardenPowerButton(
         label = "iconAlpha"
     )
 
-    // چرخش روان مدار زرد
     val orbitRotation by infiniteTransition.animateFloat(
         initialValue = 0f, targetValue = 360f,
         animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing)),
         label = "orbitRotation"
     )
 
-    // باز و بسته شدن نرم و روان خط مدار (Sweep Angle)
     val sweepAngle by infiniteTransition.animateFloat(
         initialValue = 40f, targetValue = 300f,
         animationSpec = infiniteRepeatable(tween(1000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
@@ -753,7 +801,6 @@ fun WardenPowerButton(
         modifier = Modifier.size(glowSize),
         contentAlignment = Alignment.Center
     ) {
-        // [ لایه اول: Vibrant Glow / هاله نورانی پخش و پررنگ ]
         Box(
             modifier = Modifier
                 .size(glowSize)
@@ -774,7 +821,6 @@ fun WardenPowerButton(
             modifier = Modifier.size(wrapSize),
             contentAlignment = Alignment.Center
         ) {
-            // [ لایه دوم: Liquid Glass ]
             Box(
                 modifier = Modifier
                     .size(glassSize)
@@ -783,7 +829,6 @@ fun WardenPowerButton(
                     .border(1.dp, glassBorderColor, CircleShape)
             )
 
-            // [ لایه سوم: Orbital Tracer / انیمیشن روان و جذاب مدار زرد ]
             if (isConnecting) {
                 Canvas(modifier = Modifier.size(spinRingSize)) {
                     val strokeWidthPx = 4.dp.toPx()
@@ -806,7 +851,6 @@ fun WardenPowerButton(
                 }
             }
 
-            // [ تاچ‌پد: ریپل دقیق در نقطه لمس ]
             val ripples = remember { mutableStateListOf<Pair<Animatable<Float, AnimationVector1D>, Offset>>() }
             val rippleScope = rememberCoroutineScope()
 
@@ -895,7 +939,7 @@ fun WardenPowerButton(
 }
 
 @Composable
-fun WardenProtocolSegmentedControl(
+fun AlizProtocolSegmentedControl(
     selectedProtocol: AetherProtocol,
     onProtocolSelected: (AetherProtocol) -> Unit,
     enabled: Boolean,
