@@ -284,6 +284,8 @@ private fun DashboardContent(viewModel: AetherViewModel) {
                             sessionTraffic = sessionTraffic,
                             ipInfo = ipInfo,
                             pingState = pingState,
+                            isDarkTheme = isDarkTheme, // اضافه کردن این خط
+                            onToggleTheme = onToggleTheme,
                             onToggleVpn = { handleVpnToggle() },
                             onUpdateProtocol = { proto -> viewModel.updateConfig(config.copy(protocol = proto)) },
                             onOpenSettings = { selectedTab = 1 },
