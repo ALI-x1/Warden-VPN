@@ -19,11 +19,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -73,8 +76,12 @@ fun DashboardScreen(
         }
     }
 
-    val htmlDashboardBg = MaterialTheme.colorScheme.background
-    val htmlOnDashboardBg = MaterialTheme.colorScheme.onBackground
+    // انیمیشن نرم برای تغییر رنگ پس‌زمینه اصلی صفحه هنگام تغییر تم
+    val htmlDashboardBg by animateColorAsState(
+        targetValue = MaterialTheme.colorScheme.background,
+        animationSpec = tween(700, easing = LinearOutSlowInEasing),
+        label = "bg_anim"
+    )
 
     BoxWithConstraints(
         modifier = Modifier
@@ -88,152 +95,187 @@ fun DashboardScreen(
         val isVeryCompactHeight = screenHeight < 580.dp
         val horizontalPadding = if (screenWidth < 360.dp) 12.dp else 16.dp
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    start = horizontalPadding,
-                    end = horizontalPadding,
-                    bottom = bottomContentPadding + 12.dp
-                ),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+        // انیمیشن سه‌بعدی و جذاب برای سوئیچ شدن کل محتوای صفحه بین تم تاریک و روشن
+        AnimatedContent(
+            targetState = isDarkTheme,
+            transitionSpec = {
+                (fadeIn(animationSpec = tween(600, easing = LinearOutSlowInEasing)) +
+                 scaleIn(initialScale = 0.94f, animationSpec = tween(600, easing = FastOutSlowInEasing)))
+                    .togetherWith(
+                        fadeOut(animationSpec = tween(400)) +
+                        scaleOut(targetScale = 1.04f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                    )
+            },
+            label = "theme_screen_transition",
+            modifier = Modifier.fillMaxSize()
+        ) { _ ->
+
             Column(
                 modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(top = 12.dp),
-                verticalArrangement = Arrangement.spacedBy((14 * scaleFactor).dp)
+                    .fillMaxSize()
+                    .padding(
+                        start = horizontalPadding,
+                        end = horizontalPadding,
+                        bottom = bottomContentPadding + 12.dp
+                    ),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Column {
-                        Text(
-                            text = "Warden VPN",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = htmlOnDashboardBg,
-                            fontSize = (26 * scaleFactor).sp,
-                            lineHeight = (30 * scaleFactor).sp
-                        )
-                        Text(
-                            text = if (config.connectionMode == ConnectionMode.TUNNEL) "Secure & Private" else "High-Performance Local Proxy",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = htmlOnDashboardBg.copy(alpha = 0.7f),
-                            fontSize = (12 * scaleFactor).sp,
-                            lineHeight = (16 * scaleFactor).sp
-                        )
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        
-                        // دکمه تغییر تم پیشرفته با SVG انیمیشنی هماهنگ با رنگ تم (مثل سبز روشن)
-                        ThemeToggleButton(
-                            isDarkTheme = isDarkTheme,
-                            onToggleTheme = onToggleTheme,
-                            scaleFactor = scaleFactor
-                        )
-
-                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
-
-                        if (config.connectionMode == ConnectionMode.PROXY_ONLY && connectionStatus == ConnectionStatus.RUNNING) {
-                            IconButton(
-                                onClick = { showProxyOverlay = true },
-                                modifier = Modifier.size((32 * scaleFactor).dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Info,
-                                    contentDescription = "Proxy Info",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size((22 * scaleFactor).dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
-                        }
-                        IconButton(
-                            onClick = onOpenSettings,
-                            modifier = Modifier.size((36 * scaleFactor).dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Settings",
-                                tint = htmlOnDashboardBg.copy(alpha = 0.7f),
-                                modifier = Modifier.size((24 * scaleFactor).dp)
-                            )
-                        }
-                    }
-                }
-
-                WardenStatusHeroCard(
-                    connectionStatus = connectionStatus,
-                    elapsedSeconds = elapsedSeconds,
-                    sessionTraffic = sessionTraffic,
-                    config = config,
-                    ipInfo = ipInfo,
-                    pingState = pingState,
-                    onRefreshIpInfo = onRefreshIpInfo,
-                    onRefreshPing = onRefreshPing,
-                    onShowToast = onShowToast,
-                    hideConfigChips = isCompactHeight,
-                    scaleFactor = scaleFactor
-                )
-
-                if (!isVeryCompactHeight && connectionStatus == ConnectionStatus.ERROR) {
-                    val errorColor = LocalAppTheme.current.error
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = errorColor.copy(alpha = 0.1f))
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Default.Refresh, null, tint = errorColor, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Connection failed. Please try reconnecting.",
-                                color = errorColor,
-                                fontSize = (11 * scaleFactor).sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                val minDim = if (screenWidth < screenHeight) screenWidth else screenHeight
-                val buttonWrapSize = (minDim * 0.75f).coerceIn(250.dp, 350.dp)
-                
-                WardenPowerButton(
-                    connectionStatus = connectionStatus,
-                    onToggle = onToggleVpn,
-                    wrapSize = buttonWrapSize
-                )
-            }
-
-            if (!isVeryCompactHeight) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 4.dp)
+                        .statusBarsPadding()
+                        .padding(top = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy((14 * scaleFactor).dp)
                 ) {
-                    WardenProtocolSegmentedControl(
-                        selectedProtocol = config.protocol,
-                        onProtocolSelected = onUpdateProtocol,
-                        enabled = connectionStatus == ConnectionStatus.STOPPED || connectionStatus == ConnectionStatus.ERROR,
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column {
+                            Text(
+                                text = "Warden VPN",
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = (26 * scaleFactor).sp,
+                                lineHeight = (30 * scaleFactor).sp
+                            )
+                            Text(
+                                text = if (config.connectionMode == ConnectionMode.TUNNEL) "Secure & Private" else "High-Performance Local Proxy",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                                fontSize = (12 * scaleFactor).sp,
+                                lineHeight = (16 * scaleFactor).sp
+                            )
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            
+                            // دکمه تغییر تم پیشرفته
+                            ThemeToggleButton(
+                                isDarkTheme = isDarkTheme,
+                                onToggleTheme = onToggleTheme,
+                                scaleFactor = scaleFactor
+                            )
+
+                            Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+
+                            if (config.connectionMode == ConnectionMode.PROXY_ONLY && connectionStatus == ConnectionStatus.RUNNING) {
+                                IconButton(
+                                    onClick = { showProxyOverlay = true },
+                                    modifier = Modifier.size((32 * scaleFactor).dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Proxy Info",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size((22 * scaleFactor).dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                            }
+                            
+                            // دکمه تنظیمات ارتقا یافته با هاله و انیمیشن
+                            val themeColor = MaterialTheme.colorScheme.primary
+                            val settingsRotation = remember { Animatable(0f) }
+                            val scope = rememberCoroutineScope()
+                            
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        settingsRotation.animateTo(
+                                            targetValue = settingsRotation.value + 180f,
+                                            animationSpec = tween(500, easing = FastOutSlowInEasing)
+                                        )
+                                    }
+                                    onOpenSettings()
+                                },
+                                modifier = Modifier
+                                    .size((36 * scaleFactor).dp)
+                                    .clip(CircleShape)
+                                    .background(themeColor.copy(alpha = 0.15f)) // هاله هماهنگ با تم
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings",
+                                    tint = themeColor, // رنگ هماهنگ با تم
+                                    modifier = Modifier
+                                        .size((22 * scaleFactor).dp)
+                                        .rotate(settingsRotation.value) // انیمیشن چرخش جذاب
+                                )
+                            }
+                        }
+                    }
+
+                    WardenStatusHeroCard(
+                        connectionStatus = connectionStatus,
+                        elapsedSeconds = elapsedSeconds,
+                        sessionTraffic = sessionTraffic,
+                        config = config,
+                        ipInfo = ipInfo,
+                        pingState = pingState,
+                        onRefreshIpInfo = onRefreshIpInfo,
+                        onRefreshPing = onRefreshPing,
+                        onShowToast = onShowToast,
+                        hideConfigChips = isCompactHeight,
                         scaleFactor = scaleFactor
                     )
+
+                    if (!isVeryCompactHeight && connectionStatus == ConnectionStatus.ERROR) {
+                        val errorColor = LocalAppTheme.current.error
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = errorColor.copy(alpha = 0.1f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.Refresh, null, tint = errorColor, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "Connection failed. Please try reconnecting.",
+                                    color = errorColor,
+                                    fontSize = (11 * scaleFactor).sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(vertical = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val minDim = if (screenWidth < screenHeight) screenWidth else screenHeight
+                    val buttonWrapSize = (minDim * 0.75f).coerceIn(250.dp, 350.dp)
+                    
+                    WardenPowerButton(
+                        connectionStatus = connectionStatus,
+                        onToggle = onToggleVpn,
+                        wrapSize = buttonWrapSize
+                    )
+                }
+
+                if (!isVeryCompactHeight) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 4.dp)
+                    ) {
+                        WardenProtocolSegmentedControl(
+                            selectedProtocol = config.protocol,
+                            onProtocolSelected = onUpdateProtocol,
+                            enabled = connectionStatus == ConnectionStatus.STOPPED || connectionStatus == ConnectionStatus.ERROR,
+                            scaleFactor = scaleFactor
+                        )
+                    }
                 }
             }
         }
@@ -290,7 +332,7 @@ fun DashboardScreen(
 }
 
 /**
- * دکمه تغییر تم پیشرفته با انیمیشن SVG دقیق مشابه کانسپت HTML و هماهنگ با رنگ تم (بر مبنای Material 3)
+ * دکمه تغییر تم پیشرفته با انیمیشن‌های نرم و هلال ماه کاملاً بی‌نقص
  */
 @Composable
 fun ThemeToggleButton(
@@ -299,22 +341,13 @@ fun ThemeToggleButton(
     scaleFactor: Float
 ) {
     val themeColor = MaterialTheme.colorScheme.primary
-    val containerBg = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    val containerBg = themeColor.copy(alpha = 0.15f) // هماهنگی هاله بک‌گراند با آیکون تنظیمات
 
-    // انیمیشن‌های دقیق مقیاس، چرخش و جابجایی هلال ماه و خورشید
     val sunAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 0f else 1f, animationSpec = tween(400), label = "sunAlpha")
     val sunScale by animateFloatAsState(targetValue = if (isDarkTheme) 0.3f else 1f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunScale")
-    val sunRotate by animateFloatAsState(targetValue = if (isDarkTheme) 45f else 0f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunRotate")
 
     val moonAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0f, animationSpec = tween(400), label = "moonAlpha")
     val moonScale by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0.3f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonScale")
-
-    // جابجایی افقی ماسک هلال ماه برای ایجاد انیمیشن دقیق مشابه نسخه HTML
-    val maskCx by animateFloatAsState(
-        targetValue = if (isDarkTheme) 15f else 22f,
-        animationSpec = tween(500, easing = FastOutSlowInEasing),
-        label = "maskCx"
-    )
 
     IconButton(
         onClick = onToggleTheme,
@@ -327,8 +360,8 @@ fun ThemeToggleButton(
             Canvas(modifier = Modifier.size((22 * scaleFactor).dp)) {
                 val center = Offset(size.width / 2f, size.height / 2f)
                 
+                // ترسیم خورشید (هنگام تم روشن)
                 if (!isDarkTheme || sunAlpha > 0f) {
-                    // ترسیم اشعه‌های خورشید به رنگ تم (مثلا سبز)
                     for (angle in 0 until 360 step 45) {
                         rotate(angle.toFloat(), center) {
                             drawLine(
@@ -340,22 +373,43 @@ fun ThemeToggleButton(
                             )
                         }
                     }
+                    drawCircle(
+                        color = themeColor,
+                        radius = 5.5.dp.toPx() * sunScale,
+                        center = center,
+                        alpha = sunAlpha
+                    )
                 }
 
-                // بدنه اصلی خورشید / ماه
-                drawCircle(
-                    color = themeColor,
-                    radius = if (isDarkTheme) 7.dp.toPx() * moonScale else 5.5.dp.toPx() * sunScale,
-                    center = center,
-                    alpha = if (isDarkTheme) moonAlpha else sunAlpha
-                )
-
-                // دایره ماسک‌کننده برای ایجاد شکل هلال ماه پویا
-                if (isDarkTheme) {
-                    drawCircle(
-                        color = containerBg,
-                        radius = 6.5.dp.toPx(),
-                        center = Offset(maskCx.dp.toPx(), 4.dp.toPx())
+                // ترسیم هلال ماه بی‌نقص (هنگام تم تاریک)
+                if (isDarkTheme || moonAlpha > 0f) {
+                    val moonRadius = 7.dp.toPx() * moonScale
+                    
+                    // دایره اصلی ماه
+                    val path1 = Path().apply {
+                        addOval(Rect(center.x - moonRadius, center.y - moonRadius, center.x + moonRadius, center.y + moonRadius))
+                    }
+                    
+                    // دایره‌ای که نقش ماسک را دارد (برای بریدن هلال)
+                    val maskOffset = 3.5.dp.toPx() * moonScale
+                    val path2 = Path().apply {
+                        addOval(Rect(
+                            center.x - moonRadius + maskOffset,
+                            center.y - moonRadius - maskOffset,
+                            center.x + moonRadius + maskOffset,
+                            center.y + moonRadius - maskOffset
+                        ))
+                    }
+                    
+                    // ترکیب دو دایره برای ایجاد یک هلال تمیز (برش واقعی)
+                    val crescentPath = Path().apply {
+                        op(path1, path2, PathOperation.Difference)
+                    }
+                    
+                    drawPath(
+                        path = crescentPath,
+                        color = themeColor,
+                        alpha = moonAlpha
                     )
                 }
             }
