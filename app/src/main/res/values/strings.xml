@@ -7,10 +7,63 @@
     <string name="proto_masque">MASQUE</string>
     <string name="proto_wire">WIRE</string>
     <string name="proto_gool">GOOL</string>
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Configure engine protocols &amp; transport</string>
+    <string name="search_settings">Search settings...</string>
+    <string name="appearance_language">APPEARANCE &amp; LANGUAGE</string>
+    <string name="themes">Themes</string>
+    <string name="themes_subtitle">Customize application appearance</string>
+    <string name="language_title">Language / زبان برنامه</string>
+    
+    <string name="configuration">CONFIGURATION</string>
+    <string name="preset_profiles">Preset Profiles</string>
+    <string name="preset_profiles_subtitle">Select configuration presets</string>
+    <string name="connection_routing">Connection &amp; Routing</string>
+    <string name="connection_routing_subtitle">Engine, Protocols &amp; Transport</string>
+    <string name="cloudflare_zt">Cloudflare Zero Trust</string>
+    <string name="cloudflare_zt_subtitle">Organization and Access settings</string>
+    <string name="advanced_security">Advanced Security</string>
+    <string name="advanced_security_subtitle">Kill Switch &amp; Auto-Recovery</string>
+    
+    <string name="app_settings_diagnostics">APP SETTINGS &amp; DIAGNOSTICS</string>
+    <string name="app_system_logging">App System Logging</string>
+    <string name="aether_core_logging">Aether Core Logging</string>
+    
+    <string name="backup_maintenance">BACKUP &amp; MAINTENANCE</string>
+    <string name="full_backup">Full Configuration Backup</string>
+    <string name="full_backup_subtitle">Export all settings to .astf file</string>
+    <string name="restore_backup">Restore from Backup</string>
+    <string name="restore_backup_subtitle">Import settings from an .astf file</string>
+    <string name="reset_defaults">Reset to Factory Defaults</string>
+    <string name="reset_defaults_subtitle">Wipe all custom tweaks and restart</string>
+    
+    <string name="system_stability">SYSTEM STABILITY</string>
+    <string name="battery_optimization">Battery Optimization</string>
+    <string name="battery_opt_subtitle">Allow AetherST to run without restrictions</string>
+    
+    <string name="application_logs">Application Logs</string>
+    <string name="app_logs_subtitle">View connection and system logs</string>
+    <string name="about_us">About Us</string>
+    <string name="about_us_subtitle">Version, license, and information</string>
+    
+    <!-- Dialogs & Popups -->
+    <string name="lang_system_default">System Default</string>
+    <string name="lang_sys_sub">System matching language</string>
+    <string name="lang_english">English</string>
+    <string name="lang_persian">فارسی</string>
+    
+    <string name="cancel">Cancel</string>
+    <string name="reset_title">Reset All Settings?</string>
+    <string name="reset_message">This will restore all protocols, engine tweaks, and security settings to their factory defaults. This action cannot be undone.</string>
+    <string name="reset_everything">Reset Everything</string>
+    
+    <!-- Toasts -->
+    <string name="toast_applied_manual">Applied manual configuration</string>
+    <string name="toast_applied_udp">Applied UDP/TLS Bypass</string>
+    <string name="toast_applied_stealth">Applied Ironclad Stealth</string>
+    <string name="toast_applied_turbo">Applied Turbo Speed</string>
+    <string name="toast_ip_copied">IP address copied!</string>
+    <string name="toast_system_restored">System restored to defaults</string>
 
-    <!-- کلیدهای جدید اضافه شده برای بخش زبان -->
-    <string name="language_title">App Language</string>
-    <string name="language_system">System Default</string>
-    <string name="language_english">English</string>
-    <string name="language_persian">Persian (فارسی)</string>
 </resources>
