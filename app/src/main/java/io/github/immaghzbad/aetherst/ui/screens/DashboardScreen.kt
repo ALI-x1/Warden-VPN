@@ -29,12 +29,13 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -48,6 +49,7 @@ import io.github.immaghzbad.aetherst.data.IpInfo
 import io.github.immaghzbad.aetherst.data.PingState
 import io.github.immaghzbad.aetherst.model.*
 import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
+import io.github.immaghzbad.aetherst.ui.theme.CircularRevealDashboard
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -70,6 +72,7 @@ fun DashboardScreen(
     bottomContentPadding: Dp = 0.dp
 ) {
     var showProxyOverlay by remember { mutableStateOf(true) }
+    var toggleButtonCenter by remember { mutableStateOf(Offset.Zero) }
 
     LaunchedEffect(connectionStatus) {
         if (connectionStatus != ConnectionStatus.RUNNING) {
@@ -77,40 +80,22 @@ fun DashboardScreen(
         }
     }
 
-    val htmlDashboardBg by animateColorAsState(
-        targetValue = MaterialTheme.colorScheme.background,
-        animationSpec = tween(700, easing = LinearOutSlowInEasing),
-        label = "bg_anim"
-    )
-
-    BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(htmlDashboardBg)
+    CircularRevealDashboard(
+        isDark = isDarkTheme,
+        revealOrigin = toggleButtonCenter,
+        modifier = Modifier.fillMaxSize()
     ) {
-        val screenWidth = this.maxWidth
-        val screenHeight = this.maxHeight
-        val scaleFactor = (screenWidth.value / 411f).coerceIn(0.7f, 1.1f)
-        val isCompactHeight = screenHeight < 640.dp
-        val isVeryCompactHeight = screenHeight < 580.dp
-        val horizontalPadding = if (screenWidth < 360.dp) 12.dp else 16.dp
-
-        // انیمیشن تغییر تم شبیه تلگرام (Circular Reveal از گوشه بالا سمت راست)
-        AnimatedContent(
-            targetState = isDarkTheme,
-            transitionSpec = {
-                (fadeIn(animationSpec = tween(500, easing = LinearOutSlowInEasing)) +
-                 scaleIn(
-                     initialScale = 0.05f, 
-                     transformOrigin = TransformOrigin(1f, 0f), // نقطه شروع از گوشه آیکون تم
-                     animationSpec = tween(600, easing = FastOutSlowInEasing)
-                 )) togetherWith (
-                     fadeOut(animationSpec = tween(400))
-                 )
-            },
-            label = "theme_screen_transition",
-            modifier = Modifier.fillMaxSize()
-        ) { _ ->
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            val screenWidth = this.maxWidth
+            val screenHeight = this.maxHeight
+            val scaleFactor = (screenWidth.value / 411f).coerceIn(0.7f, 1.1f)
+            val isCompactHeight = screenHeight < 640.dp
+            val isVeryCompactHeight = screenHeight < 580.dp
+            val horizontalPadding = if (screenWidth < 360.dp) 12.dp else 16.dp
 
             Column(
                 modifier = Modifier
@@ -152,11 +137,12 @@ fun DashboardScreen(
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             
-                            // دکمه تغییر تم با هاله نرم
+                            // دکمه تغییر تم با محاسبه مختصات دقیق
                             ThemeToggleButton(
                                 isDarkTheme = isDarkTheme,
                                 onToggleTheme = onToggleTheme,
-                                scaleFactor = scaleFactor
+                                scaleFactor = scaleFactor,
+                                onCenterCalculated = { center -> toggleButtonCenter = center }
                             )
 
                             Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
@@ -285,55 +271,55 @@ fun DashboardScreen(
                     }
                 }
             }
-        }
 
-        val offsetY = remember { Animatable(0f) }
-        val scope = rememberCoroutineScope()
+            val offsetY = remember { Animatable(0f) }
+            val scope = rememberCoroutineScope()
 
-        LaunchedEffect(showProxyOverlay) {
-            if (showProxyOverlay) {
-                offsetY.snapTo(0f)
+            LaunchedEffect(showProxyOverlay) {
+                if (showProxyOverlay) {
+                    offsetY.snapTo(0f)
+                }
             }
-        }
 
-        AnimatedVisibility(
-            visible = config.connectionMode == ConnectionMode.PROXY_ONLY && connectionStatus == ConnectionStatus.RUNNING && showProxyOverlay,
-            enter = slideInVertically { -it } + fadeIn(),
-            exit = slideOutVertically { -it } + fadeOut(),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = 12.dp)
-                .graphicsLayer { translationY = offsetY.value }
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onDragEnd = {
-                            scope.launch {
-                                if (offsetY.value < -100f) {
-                                    showProxyOverlay = false
-                                } else {
-                                    offsetY.animateTo(0f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+            AnimatedVisibility(
+                visible = config.connectionMode == ConnectionMode.PROXY_ONLY && connectionStatus == ConnectionStatus.RUNNING && showProxyOverlay,
+                enter = slideInVertically { -it } + fadeIn(),
+                exit = slideOutVertically { -it } + fadeOut(),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = 12.dp)
+                    .graphicsLayer { translationY = offsetY.value }
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures(
+                            onDragEnd = {
+                                scope.launch {
+                                    if (offsetY.value < -100f) {
+                                        showProxyOverlay = false
+                                    } else {
+                                        offsetY.animateTo(0f, spring(dampingRatio = Spring.DampingRatioMediumBouncy))
+                                    }
+                                }
+                            },
+                            onVerticalDrag = { _, dragAmount ->
+                                scope.launch {
+                                    offsetY.snapTo((offsetY.value + dragAmount).coerceAtMost(20f))
                                 }
                             }
-                        },
-                        onVerticalDrag = { _, dragAmount ->
-                            scope.launch {
-                                offsetY.snapTo((offsetY.value + dragAmount).coerceAtMost(20f))
-                            }
-                        }
-                    )
-                }
-        ) {
-            ProxyOverlayPill(
-                host = config.socksHost,
-                socksPort = config.socksPort,
-                httpPort = config.httpPort,
-                onHide = { showProxyOverlay = false },
-                onCopy = { 
-                    onShowToast("Address copied: $it", false)
-                },
-                scaleFactor = scaleFactor
-            )
+                        )
+                    }
+            ) {
+                ProxyOverlayPill(
+                    host = config.socksHost,
+                    socksPort = config.socksPort,
+                    httpPort = config.httpPort,
+                    onHide = { showProxyOverlay = false },
+                    onCopy = { 
+                        onShowToast("Address copied: $it", false)
+                    },
+                    scaleFactor = scaleFactor
+                )
+            }
         }
     }
 }
@@ -342,7 +328,8 @@ fun DashboardScreen(
 fun ThemeToggleButton(
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
-    scaleFactor: Float
+    scaleFactor: Float,
+    onCenterCalculated: (Offset) -> Unit = {}
 ) {
     val themeColor = MaterialTheme.colorScheme.primary
     val themeHaloBrush = remember(themeColor) {
@@ -361,7 +348,16 @@ fun ThemeToggleButton(
         onClick = onToggleTheme,
         modifier = Modifier
             .size((36 * scaleFactor).dp)
-            .background(themeHaloBrush) // استفاده از براش شعاعی بدون لبه تیز
+            .background(themeHaloBrush)
+            .onGloballyPositioned { coordinates ->
+                val rootPosition = coordinates.positionInRoot()
+                val size = coordinates.size
+                val center = Offset(
+                    x = rootPosition.x + (size.width / 2f),
+                    y = rootPosition.y + (size.height / 2f)
+                )
+                onCenterCalculated(center)
+            }
     ) {
         Box(contentAlignment = Alignment.Center) {
             Canvas(modifier = Modifier.size((22 * scaleFactor).dp)) {
