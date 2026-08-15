@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +48,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.LocaleManagerCompat
 import androidx.core.os.LocaleListCompat
 import androidx.appcompat.app.AppCompatDelegate
+import io.github.immaghzbad.aetherst.R
 import io.github.immaghzbad.aetherst.core.NetworkUtils
 import io.github.immaghzbad.aetherst.model.*
 
@@ -92,7 +94,7 @@ fun SettingsScreen(
     val currentLanguageDisplay = when {
         currentLocale.startsWith("fa") -> "فارسی"
         currentLocale.startsWith("en") -> "English"
-        else -> "System Default"
+        else -> stringResource(id = R.string.lang_system_default)
     }
 
     fun setAppLanguage(languageCode: String) {
@@ -174,7 +176,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "Settings",
+                            text = stringResource(id = R.string.settings_title),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.ExtraBold,
                             color = primaryText,
@@ -182,7 +184,7 @@ fun SettingsScreen(
                             lineHeight = (32 * scaleFactor).sp
                         )
                         Text(
-                            text = "Configure engine protocols & transport",
+                            text = stringResource(id = R.string.settings_subtitle),
                             style = MaterialTheme.typography.bodySmall,
                             color = secondaryText,
                             fontSize = (13 * scaleFactor).sp,
@@ -212,7 +214,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Box(contentAlignment = Alignment.CenterStart) {
                                 if (searchQuery.isEmpty()) {
-                                    Text("Search settings...", color = secondaryText, fontSize = (15 * scaleFactor).sp)
+                                    Text(stringResource(id = R.string.search_settings), color = secondaryText, fontSize = (15 * scaleFactor).sp)
                                 }
                                 innerTextField()
                             }
@@ -224,19 +226,19 @@ fun SettingsScreen(
             // Appearance & Language
             if (searchQuery.isEmpty() || "Themes Appearance Language زبان".contains(searchQuery, ignoreCase = true)) {
                 item {
-                    IosSectionHeader(title = "APPEARANCE & LANGUAGE", scaleFactor = scaleFactor, color = secondaryText)
+                    IosSectionHeader(title = stringResource(id = R.string.appearance_language), scaleFactor = scaleFactor, color = secondaryText)
                     IosGroupCard(cardBg = cardBg) {
                         Column {
                             IosPresetItem(
                                 icon = Icons.Default.Palette, iconBg = Color(0xFF007AFF),
-                                title = "Themes", subtitle = "Customize application appearance",
+                                title = stringResource(id = R.string.themes), subtitle = stringResource(id = R.string.themes_subtitle),
                                 isActive = false, onClick = onOpenThemes, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.Language, iconBg = Color(0xFFFF2D55),
-                                title = "Language / زبان برنامه", subtitle = currentLanguageDisplay,
+                                title = stringResource(id = R.string.language_title), subtitle = currentLanguageDisplay,
                                 isActive = false, onClick = { showLanguageSheet = true },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                             )
@@ -248,19 +250,19 @@ fun SettingsScreen(
             // Configuration Group
             if (searchQuery.isEmpty() || "Preset Profiles Custom Manual Tweaks Connection Engine Transport Protocol Bypass Obfuscation Speed Strategy Network Stack Whole Device Split Tunneling Domain Routing VPN Tunnel Mode SOCKS5 HTTP Host Port MTU Keepalive Peer Advanced Security Kill Switch IPv6 Leak Protection Smart Reconnect Cloudflare Zero Trust Team Access Gateway ID Secret Token".contains(searchQuery, ignoreCase = true)) {
                 item {
-                    IosSectionHeader(title = "CONFIGURATION", scaleFactor = scaleFactor, color = secondaryText)
+                    IosSectionHeader(title = stringResource(id = R.string.configuration), scaleFactor = scaleFactor, color = secondaryText)
                     IosGroupCard(cardBg = cardBg) {
                         Column {
                             IosPresetItem(
                                 icon = Icons.Default.Tune, iconBg = Color(0xFF5856D6),
-                                title = "Preset Profiles", subtitle = "Select configuration presets",
+                                title = stringResource(id = R.string.preset_profiles), subtitle = stringResource(id = R.string.preset_profiles_subtitle),
                                 isActive = false, onClick = { showProfilesSheet = true },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                             )
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.Router, iconBg = Color(0xFFFF9500),
-                                title = "Connection & Routing", subtitle = "Engine, Protocols & Transport",
+                                title = stringResource(id = R.string.connection_routing), subtitle = stringResource(id = R.string.connection_routing_subtitle),
                                 isActive = false, onClick = { showConnectionSheet = true },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                             )
@@ -268,7 +270,7 @@ fun SettingsScreen(
                                 HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                                 IosPresetItem(
                                     icon = Icons.Default.Business, iconBg = Color(0xFF5856D6),
-                                    title = "Cloudflare Zero Trust", subtitle = "Organization and Access settings",
+                                    title = stringResource(id = R.string.cloudflare_zt), subtitle = stringResource(id = R.string.cloudflare_zt_subtitle),
                                     isActive = false, onClick = { showZeroTrustSheet = true },
                                     scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                                 )
@@ -277,7 +279,7 @@ fun SettingsScreen(
                                 HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                                 IosPresetItem(
                                     icon = Icons.Default.Security, iconBg = Color(0xFF34C759),
-                                    title = "Advanced Security", subtitle = "Kill Switch & Auto-Recovery",
+                                    title = stringResource(id = R.string.advanced_security), subtitle = stringResource(id = R.string.advanced_security_subtitle),
                                     isActive = false, onClick = { showSecuritySheet = true },
                                     scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                                 )
@@ -290,12 +292,12 @@ fun SettingsScreen(
             // Diagnostics & App Settings
             if (searchQuery.isEmpty() || "Logging System Logs App Core Level Diagnostics About".contains(searchQuery, ignoreCase = true)) {
                 item {
-                    IosSectionHeader(title = "APP SETTINGS & DIAGNOSTICS", scaleFactor = scaleFactor, color = secondaryText)
+                    IosSectionHeader(title = stringResource(id = R.string.app_settings_diagnostics), scaleFactor = scaleFactor, color = secondaryText)
                     IosGroupCard(cardBg = cardBg) {
                         Column {
                             IosPickerRow(
                                 icon = Icons.Default.BugReport, iconBg = Color(0xFF64D2FF),
-                                title = "App System Logging", value = config.appLogLevel.displayName.substringBefore(" ("),
+                                title = stringResource(id = R.string.app_system_logging), value = config.appLogLevel.displayName.substringBefore(" ("),
                                 options = AetherLogLevel.entries.map { it.displayName },
                                 onOptionSelected = { onUpdateConfig(config.copy(appLogLevel = AetherLogLevel.entries[it])) },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText, sheetBg = groupBg
@@ -303,7 +305,7 @@ fun SettingsScreen(
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPickerRow(
                                 icon = Icons.Default.VpnLock, iconBg = Color(0xFF8E8E93),
-                                title = "Aether Core Logging", value = config.coreLogLevel.displayName.substringBefore(" ("),
+                                title = stringResource(id = R.string.aether_core_logging), value = config.coreLogLevel.displayName.substringBefore(" ("),
                                 options = AetherLogLevel.entries.map { it.displayName },
                                 onOptionSelected = { onUpdateConfig(config.copy(coreLogLevel = AetherLogLevel.entries[it])) },
                                 scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText, sheetBg = groupBg
@@ -316,26 +318,26 @@ fun SettingsScreen(
             // Backup & System Maintenance
             if (searchQuery.isEmpty() || "Backup Restore Reset System Defaults".contains(searchQuery, ignoreCase = true)) {
                 item {
-                    IosSectionHeader(title = "BACKUP & MAINTENANCE", scaleFactor = scaleFactor, color = secondaryText)
+                    IosSectionHeader(title = stringResource(id = R.string.backup_maintenance), scaleFactor = scaleFactor, color = secondaryText)
                     IosGroupCard(cardBg = cardBg) {
                         Column {
                             IosPresetItem(
                                 icon = Icons.Default.CloudUpload, iconBg = Color(0xFF5856D6),
-                                title = "Full Configuration Backup", subtitle = "Export all settings to .astf file",
+                                title = stringResource(id = R.string.full_backup), subtitle = stringResource(id = R.string.full_backup_subtitle),
                                 isActive = false, onClick = onExportBackup, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.CloudDownload, iconBg = Color(0xFF34C759),
-                                title = "Restore from Backup", subtitle = "Import settings from an .astf file",
+                                title = stringResource(id = R.string.restore_backup), subtitle = stringResource(id = R.string.restore_backup_subtitle),
                                 isActive = false, onClick = { fullBackupPicker.launch("*/*") }, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.DeleteForever, iconBg = Color(0xFFFF3B30),
-                                title = "Reset to Factory Defaults", subtitle = "Wipe all custom tweaks and restart",
+                                title = stringResource(id = R.string.reset_defaults), subtitle = stringResource(id = R.string.reset_defaults_subtitle),
                                 isActive = false, onClick = { showResetDialog = true }, scaleFactor = scaleFactor,
                                 textColor = Color(0xFFFF3B30), subTextColor = secondaryText
                             )
@@ -346,12 +348,12 @@ fun SettingsScreen(
 
             // System Stability
             item {
-                IosSectionHeader(title = "SYSTEM STABILITY", scaleFactor = scaleFactor, color = secondaryText)
+                IosSectionHeader(title = stringResource(id = R.string.system_stability), scaleFactor = scaleFactor, color = secondaryText)
                 IosGroupCard(cardBg = cardBg) {
                     Column {
                         IosSwitchRow(
                             icon = Icons.Default.BatteryAlert, iconBg = Color(0xFFFF3B30),
-                            title = "Battery Optimization", subtitle = "Allow AetherST to run without restrictions",
+                            title = stringResource(id = R.string.battery_optimization), subtitle = stringResource(id = R.string.battery_opt_subtitle),
                             checked = isBatteryOptimized, enabled = !isBatteryOptimized,
                             onCheckedChange = { if (it) onRequestBatteryOptimization() },
                             testTag = "switch_battery_opt", scaleFactor = scaleFactor,
@@ -369,14 +371,14 @@ fun SettingsScreen(
                         Column {
                             IosPresetItem(
                                 icon = Icons.Default.Code, iconBg = Color(0xFF34C759),
-                                title = "Application Logs", subtitle = "View connection and system logs",
+                                title = stringResource(id = R.string.application_logs), subtitle = stringResource(id = R.string.app_logs_subtitle),
                                 isActive = false, onClick = onOpenLogs, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.Info, iconBg = Color(0xFF8E8E93),
-                                title = "About Us", subtitle = "Version, license, and information",
+                                title = stringResource(id = R.string.about_us), subtitle = stringResource(id = R.string.about_us_subtitle),
                                 isActive = false, onClick = onOpenAbout, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
@@ -395,24 +397,24 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
                     Text(
-                        text = "زبان / Language", color = primaryText, fontWeight = FontWeight.Bold,
+                        text = stringResource(id = R.string.language_title), color = primaryText, fontWeight = FontWeight.Bold,
                         fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), textAlign = TextAlign.Center
                     )
                     IosPresetItem(
                         icon = Icons.Default.SettingsSuggest, iconBg = Color(0xFF8E8E93),
-                        title = "System Default", subtitle = "زبان سیستم گوشی", isActive = currentLocale.isEmpty(),
+                        title = stringResource(id = R.string.lang_system_default), subtitle = stringResource(id = R.string.lang_sys_sub), isActive = currentLocale.isEmpty(),
                         onClick = { setAppLanguage(""); showLanguageSheet = false },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                     IosPresetItem(
                         icon = Icons.Default.Language, iconBg = Color(0xFF007AFF),
-                        title = "English", subtitle = "انگلیسی", isActive = currentLocale.startsWith("en"),
+                        title = stringResource(id = R.string.lang_english), subtitle = "English", isActive = currentLocale.startsWith("en"),
                         onClick = { setAppLanguage("en"); showLanguageSheet = false },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                     IosPresetItem(
                         icon = Icons.Default.Language, iconBg = Color(0xFF34C759),
-                        title = "فارسی", subtitle = "Persian", isActive = currentLocale.startsWith("fa"),
+                        title = stringResource(id = R.string.lang_persian), subtitle = "Persian", isActive = currentLocale.startsWith("fa"),
                         onClick = { setAppLanguage("fa"); showLanguageSheet = false },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
@@ -422,6 +424,11 @@ fun SettingsScreen(
 
         // ====== پاپ آپ پروفایل‌ها ======
         if (showProfilesSheet) {
+            val toastManual = stringResource(id = R.string.toast_applied_manual)
+            val toastUdp = stringResource(id = R.string.toast_applied_udp)
+            val toastStealth = stringResource(id = R.string.toast_applied_stealth)
+            val toastTurbo = stringResource(id = R.string.toast_applied_turbo)
+            
             ModalBottomSheet(
                 onDismissRequest = { showProfilesSheet = false },
                 containerColor = bgColor,
@@ -429,42 +436,42 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
                     Text(
-                        text = "Preset Profiles", color = primaryText, fontWeight = FontWeight.Bold,
+                        text = stringResource(id = R.string.preset_profiles), color = primaryText, fontWeight = FontWeight.Bold,
                         fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), textAlign = TextAlign.Center
                     )
                     IosPresetItem(
                         icon = Icons.Default.Tune, iconBg = Color(0xFF8E8E93),
                         title = "Custom Manual Tweaks", subtitle = "Your own independent manual configuration",
                         isActive = config.presetId == "custom",
-                        onClick = { onApplyPreset("custom"); showProfilesSheet = false; onShowToast("Applied manual configuration", false) },
+                        onClick = { onApplyPreset("custom"); showProfilesSheet = false; onShowToast(toastManual, false) },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                     IosPresetItem(
                         icon = Icons.Default.Lock, iconBg = Color(0xFF5856D6),
                         title = "Bypass UDP / TLS", subtitle = "MASQUE + H2 Fallback + Fragmentation",
                         isActive = config.presetId == "bypass_udp",
-                        onClick = { onApplyPreset("bypass_udp"); showProfilesSheet = false; onShowToast("Applied UDP/TLS Bypass", false) },
+                        onClick = { onApplyPreset("bypass_udp"); showProfilesSheet = false; onShowToast(toastUdp, false) },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                     IosPresetItem(
                         icon = Icons.Default.Shield, iconBg = Color(0xFF007AFF),
                         title = "Ironclad Stealth", subtitle = "MASQUE + GFW Noise + Probe Scan",
                         isActive = config.presetId == "ironclad_stealth",
-                        onClick = { onApplyPreset("ironclad_stealth"); showProfilesSheet = false; onShowToast("Applied Ironclad Stealth", false) },
+                        onClick = { onApplyPreset("ironclad_stealth"); showProfilesSheet = false; onShowToast(toastStealth, false) },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                     IosPresetItem(
                         icon = Icons.Default.Bolt, iconBg = Color(0xFFFF9500),
                         title = "Turbo Speed", subtitle = "WireGuard + Balanced Noise + Turbo Scan",
                         isActive = config.presetId == "turbo_wg",
-                        onClick = { onApplyPreset("turbo_wg"); showProfilesSheet = false; onShowToast("Applied Turbo Speed", false) },
+                        onClick = { onApplyPreset("turbo_wg"); showProfilesSheet = false; onShowToast(toastTurbo, false) },
                         scaleFactor = scaleFactor, textColor = primaryText, subTextColor = secondaryText
                     )
                 }
             }
         }
 
-        // ====== پاپ آپ تنظیمات اتصال (کامل شده با قابلیت‌های فایل قبلی) ======
+        // ====== پاپ آپ تنظیمات اتصال ======
         if (showConnectionSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showConnectionSheet = false },
@@ -474,7 +481,7 @@ fun SettingsScreen(
                 LazyColumn(modifier = Modifier.padding(bottom = 24.dp)) {
                     item {
                         Text(
-                            text = "Connection & Routing", color = primaryText, fontWeight = FontWeight.Bold,
+                            text = stringResource(id = R.string.connection_routing), color = primaryText, fontWeight = FontWeight.Bold,
                             fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), textAlign = TextAlign.Center
                         )
                     }
@@ -628,6 +635,7 @@ fun SettingsScreen(
                             ) {
                                 var localIp by remember { mutableStateOf<String?>(null) }
                                 val clipboardManager = LocalClipboardManager.current
+                                val toastIpCopied = stringResource(id = R.string.toast_ip_copied)
                                 LaunchedEffect(Unit) { localIp = NetworkUtils.getLocalIpAddress() }
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -661,7 +669,7 @@ fun SettingsScreen(
                                             IconButton(
                                                 onClick = {
                                                     clipboardManager.setText(AnnotatedString(localIp!!))
-                                                    onShowToast("IP address copied!", false)
+                                                    onShowToast(toastIpCopied, false)
                                                 },
                                                 modifier = Modifier.size(28.dp)
                                             ) {
@@ -824,7 +832,7 @@ fun SettingsScreen(
                 LazyColumn(modifier = Modifier.padding(bottom = 24.dp)) {
                     item {
                         Text(
-                            text = "Cloudflare Zero Trust", color = primaryText, fontWeight = FontWeight.Bold,
+                            text = stringResource(id = R.string.cloudflare_zt), color = primaryText, fontWeight = FontWeight.Bold,
                             fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), textAlign = TextAlign.Center
                         )
                     }
@@ -917,7 +925,7 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(bottom = 24.dp)) {
                     Text(
-                        text = "Advanced Security", color = primaryText, fontWeight = FontWeight.Bold,
+                        text = stringResource(id = R.string.advanced_security), color = primaryText, fontWeight = FontWeight.Bold,
                         fontSize = 20.sp, modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), textAlign = TextAlign.Center
                     )
                     IosSwitchRow(
@@ -979,15 +987,16 @@ fun SettingsScreen(
 
         // Dialog for Reset
         if (showResetDialog) {
+            val toastRestored = stringResource(id = R.string.toast_system_restored)
             IosConfirmationDialog(
-                title = "Reset All Settings?",
-                message = "This will restore all protocols, engine tweaks, and security settings to their factory defaults. This action cannot be undone.",
-                confirmText = "Reset Everything",
+                title = stringResource(id = R.string.reset_title),
+                message = stringResource(id = R.string.reset_message),
+                confirmText = stringResource(id = R.string.reset_everything),
                 confirmColor = Color(0xFFFF3B30),
                 onConfirm = {
                     onResetAll()
                     showResetDialog = false
-                    onShowToast("System restored to defaults", false)
+                    onShowToast(toastRestored, false)
                 },
                 onDismiss = { showResetDialog = false },
                 scaleFactor = scaleFactor,
@@ -1184,7 +1193,7 @@ private fun IosInputFieldRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
@@ -1316,7 +1325,7 @@ fun IosConfirmationDialog(
                             modifier = Modifier.weight(1f).height((50 * scaleFactor).dp),
                             shape = RoundedCornerShape(12.dp),
                         ) {
-                            Text(text = "Cancel", fontWeight = FontWeight.Medium, fontSize = (14 * scaleFactor).sp, color = primaryText)
+                            Text(text = stringResource(id = R.string.cancel), fontWeight = FontWeight.Medium, fontSize = (14 * scaleFactor).sp, color = primaryText)
                         }
                         Button(
                             onClick = onConfirm,
