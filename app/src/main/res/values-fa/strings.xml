@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+        <string name="app_name">Warden Vpn</string>
+    <string name="widget_title">Warden Vpn</string>
+    <string name="widget_status_disconnected">قطع شده</string>
+    <string name="widget_button_desc">تغییر وضعیت اتصال</string>
+    <string name="proto_masque">MASQUE</string>
+    <string name="proto_wire">WIRE</string>
+    <string name="proto_gool">GOOL</string>
         <!-- Settings Screen -->
     <string name="settings_title">تنظیمات</string>
     <string name="settings_subtitle">پیکربندی هسته و پروتکل‌های انتقال</string>
