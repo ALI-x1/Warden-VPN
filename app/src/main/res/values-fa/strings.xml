@@ -58,19 +58,5 @@
     <string name="toast_applied_turbo">حالت سرعت توربو اعمال شد</string>
     <string name="toast_ip_copied">آدرس آی‌پی کپی شد!</string>
     <string name="toast_system_restored">سیستم به حالت پیش‌فرض بازگشت</string>
-
-    <!-- ترجمه کلیدهای اصلی پروژه -->
-    <string name="app_name">Warden Vpn</string>
-    <string name="widget_title">Warden Vpn</string>
-    <string name="widget_status_disconnected">قطع شده</string>
-    <string name="widget_button_desc">تغییر وضعیت اتصال</string>
-    <string name="proto_masque">MASQUE</string>
-    <string name="proto_wire">WIRE</string>
-    <string name="proto_gool">GOOL</string>
-
-    <!-- ترجمه کلیدهای بخش زبان -->
-    <string name="language_title">زبان برنامه</string>
-    <string name="language_system">پیش‌فرض سیستم</string>
-    <string name="language_english">English</string>
-    <string name="language_persian">فارسی</string>
+        
 </resources>
