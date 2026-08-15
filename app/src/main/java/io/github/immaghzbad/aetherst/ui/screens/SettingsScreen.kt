@@ -106,6 +106,11 @@ fun SettingsScreen(
             LocaleListCompat.forLanguageTags(languageCode)
         }
         AppCompatDelegate.setApplicationLocales(localeList)
+        
+        // رفرش کردن اکتیویتی برای اعمال قطعی زبان در ComponentActivity برای نسخه‌های قدیمی‌تر اندروید
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+            (context as? android.app.Activity)?.recreate()
+        }
     }
 
     // اتصال رنگ‌ها به تم اصلی متریال دیزاین
