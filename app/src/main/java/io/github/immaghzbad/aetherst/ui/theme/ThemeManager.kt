@@ -22,7 +22,6 @@ object ThemeManager {
 
     private var initialized = false
 
-    /** فراخوانی مستقیم و هم‌زمان تم ذخیره‌شده جهت جلوگیری از پرش رنگ */
     fun init(context: Context) {
         if (initialized) return
         initialized = true
@@ -33,7 +32,6 @@ object ThemeManager {
         }
     }
 
-    /** اعمال تم جدید و ذخیره‌سازی آن */
     fun setTheme(context: Context, themeId: String) {
         if (AppThemes.none { it.id == themeId }) return
         selectedThemeId = themeId
@@ -42,5 +40,18 @@ object ThemeManager {
             .edit()
             .putString(KEY_THEME_ID, themeId)
             .apply()
+    }
+
+    // ⬇️ تابع جدید
+    /** جابجایی بین نسخه‌ی روشن و تیره‌ی همون رنگِ فعلی (مثلاً light-blue <-> dark-blue) */
+    fun toggleBrightness(context: Context) {
+        val current = currentTheme
+        val prefix = if (current.isDark) "dark-" else "light-"
+        val newPrefix = if (current.isDark) "light-" else "dark-"
+        val colorName = current.id.removePrefix(prefix)
+        val newId = "$newPrefix$colorName"
+        if (AppThemes.any { it.id == newId }) {
+            setTheme(context, newId)
+        }
     }
 }
