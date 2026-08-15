@@ -3,7 +3,7 @@ package io.github.immaghzbad.aetherst
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity // تغییر به AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +14,7 @@ import io.github.immaghzbad.aetherst.ui.theme.MyApplicationTheme
 import io.github.immaghzbad.aetherst.ui.AetherViewModel
 import io.github.immaghzbad.aetherst.ui.screens.MainScreen
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() { // تغییر از ComponentActivity به AppCompatActivity
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,3 +35,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
