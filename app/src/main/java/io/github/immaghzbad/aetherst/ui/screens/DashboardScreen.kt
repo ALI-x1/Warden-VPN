@@ -1,4 +1,4 @@
-package io.github.aliz.aetherst.ui.screens
+package io.github.immaghzbad.aetherst.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -40,10 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.aliz.aetherst.data.IpInfo
-import io.github.aliz.aetherst.data.PingState
-import io.github.aliz.aetherst.model.*
-import io.github.aliz.aetherst.ui.theme.LocalAppTheme
+import io.github.immaghzbad.aetherst.data.IpInfo
+import io.github.immaghzbad.aetherst.data.PingState
+import io.github.immaghzbad.aetherst.model.*
+import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -111,7 +111,7 @@ fun DashboardScreen(
                 ) {
                     Column {
                         Text(
-                            text = "ALIZ",
+                            text = "Warden VPN",
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = htmlOnDashboardBg,
@@ -128,7 +128,7 @@ fun DashboardScreen(
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         
-                        // دکمه تغییر تم (خورشید و ماه) دقیقاً با منطق HTML
+                        // دکمه تغییر تم پیشرفته با SVG انیمیشنی هماهنگ با رنگ تم (مثل سبز روشن)
                         ThemeToggleButton(
                             isDarkTheme = isDarkTheme,
                             onToggleTheme = onToggleTheme,
@@ -165,7 +165,7 @@ fun DashboardScreen(
                     }
                 }
 
-                AlizStatusHeroCard(
+                WardenStatusHeroCard(
                     connectionStatus = connectionStatus,
                     elapsedSeconds = elapsedSeconds,
                     sessionTraffic = sessionTraffic,
@@ -215,7 +215,7 @@ fun DashboardScreen(
                 val minDim = if (screenWidth < screenHeight) screenWidth else screenHeight
                 val buttonWrapSize = (minDim * 0.75f).coerceIn(250.dp, 350.dp)
                 
-                AlizPowerButton(
+                WardenPowerButton(
                     connectionStatus = connectionStatus,
                     onToggle = onToggleVpn,
                     wrapSize = buttonWrapSize
@@ -228,7 +228,7 @@ fun DashboardScreen(
                         .fillMaxWidth()
                         .padding(bottom = 4.dp)
                 ) {
-                    AlizProtocolSegmentedControl(
+                    WardenProtocolSegmentedControl(
                         selectedProtocol = config.protocol,
                         onProtocolSelected = onUpdateProtocol,
                         enabled = connectionStatus == ConnectionStatus.STOPPED || connectionStatus == ConnectionStatus.ERROR,
@@ -289,52 +289,76 @@ fun DashboardScreen(
     }
 }
 
+/**
+ * دکمه تغییر تم پیشرفته با انیمیشن SVG دقیق مشابه کانسپت HTML و هماهنگ با رنگ تم (بر مبنای Material 3)
+ */
 @Composable
 fun ThemeToggleButton(
     isDarkTheme: Boolean,
     onToggleTheme: () -> Unit,
     scaleFactor: Float
 ) {
-    // پیاده‌سازی انیمیشن دقیق مشابه پروتوتایپ HTML (Scale, Rotation, Alpha)
+    val themeColor = MaterialTheme.colorScheme.primary
+    val containerBg = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+
+    // انیمیشن‌های دقیق مقیاس، چرخش و جابجایی هلال ماه و خورشید
     val sunAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 0f else 1f, animationSpec = tween(400), label = "sunAlpha")
     val sunScale by animateFloatAsState(targetValue = if (isDarkTheme) 0.3f else 1f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunScale")
-    val sunRotate by animateFloatAsState(targetValue = if (isDarkTheme) 90f else 0f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunRotate")
+    val sunRotate by animateFloatAsState(targetValue = if (isDarkTheme) 45f else 0f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunRotate")
 
     val moonAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0f, animationSpec = tween(400), label = "moonAlpha")
     val moonScale by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0.3f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonScale")
-    val moonRotate by animateFloatAsState(targetValue = if (isDarkTheme) 0f else -90f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonRotate")
+
+    // جابجایی افقی ماسک هلال ماه برای ایجاد انیمیشن دقیق مشابه نسخه HTML
+    val maskCx by animateFloatAsState(
+        targetValue = if (isDarkTheme) 15f else 22f,
+        animationSpec = tween(500, easing = FastOutSlowInEasing),
+        label = "maskCx"
+    )
 
     IconButton(
         onClick = onToggleTheme,
-        modifier = Modifier.size((36 * scaleFactor).dp)
+        modifier = Modifier
+            .size((36 * scaleFactor).dp)
+            .clip(CircleShape)
+            .background(containerBg)
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = Icons.Default.WbSunny,
-                contentDescription = "Light Mode",
-                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .size((24 * scaleFactor).dp)
-                    .graphicsLayer {
-                        alpha = sunAlpha
-                        scaleX = sunScale
-                        scaleY = sunScale
-                        rotationZ = sunRotate
+            Canvas(modifier = Modifier.size((22 * scaleFactor).dp)) {
+                val center = Offset(size.width / 2f, size.height / 2f)
+                
+                if (!isDarkTheme || sunAlpha > 0f) {
+                    // ترسیم اشعه‌های خورشید به رنگ تم (مثلا سبز)
+                    for (angle in 0 until 360 step 45) {
+                        rotate(angle.toFloat(), center) {
+                            drawLine(
+                                color = themeColor.copy(alpha = sunAlpha),
+                                start = Offset(center.x, 2f),
+                                end = Offset(center.x, 6f),
+                                strokeWidth = 2.dp.toPx(),
+                                cap = StrokeCap.Round
+                            )
+                        }
                     }
-            )
-            Icon(
-                imageVector = Icons.Default.DarkMode,
-                contentDescription = "Dark Mode",
-                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .size((24 * scaleFactor).dp)
-                    .graphicsLayer {
-                        alpha = moonAlpha
-                        scaleX = moonScale
-                        scaleY = moonScale
-                        rotationZ = moonRotate
-                    }
-            )
+                }
+
+                // بدنه اصلی خورشید / ماه
+                drawCircle(
+                    color = themeColor,
+                    radius = if (isDarkTheme) 7.dp.toPx() * moonScale else 5.5.dp.toPx() * sunScale,
+                    center = center,
+                    alpha = if (isDarkTheme) moonAlpha else sunAlpha
+                )
+
+                // دایره ماسک‌کننده برای ایجاد شکل هلال ماه پویا
+                if (isDarkTheme) {
+                    drawCircle(
+                        color = containerBg,
+                        radius = 6.5.dp.toPx(),
+                        center = Offset(maskCx.dp.toPx(), 4.dp.toPx())
+                    )
+                }
+            }
         }
     }
 }
@@ -425,7 +449,7 @@ private fun ProxyCopyRow(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun AlizStatusHeroCard(
+fun WardenStatusHeroCard(
     connectionStatus: ConnectionStatus,
     elapsedSeconds: Long,
     sessionTraffic: SessionTraffic,
@@ -693,7 +717,7 @@ fun AlizStatusHeroCard(
 }
 
 @Composable
-fun AlizPowerButton(
+fun WardenPowerButton(
     connectionStatus: ConnectionStatus,
     onToggle: () -> Unit,
     wrapSize: Dp
@@ -939,7 +963,7 @@ fun AlizPowerButton(
 }
 
 @Composable
-fun AlizProtocolSegmentedControl(
+fun WardenProtocolSegmentedControl(
     selectedProtocol: AetherProtocol,
     onProtocolSelected: (AetherProtocol) -> Unit,
     enabled: Boolean,
