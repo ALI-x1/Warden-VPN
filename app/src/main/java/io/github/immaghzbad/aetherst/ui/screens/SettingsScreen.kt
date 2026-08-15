@@ -45,9 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.app.LocaleManagerCompat
-import androidx.core.os.LocaleListCompat
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import io.github.immaghzbad.aetherst.R
 import io.github.immaghzbad.aetherst.core.NetworkUtils
 import io.github.immaghzbad.aetherst.model.*
@@ -88,9 +87,12 @@ fun SettingsScreen(
     var showSecuritySheet by remember { mutableStateOf(false) }
     var showLanguageSheet by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+    
+    // انتقال استیت IP به بالا برای جلوگیری از پاک شدن هنگام اسکرول کردن لیست
+    var localIp by remember { mutableStateOf<String?>(null) }
 
     // توابع و متغیرهای مربوط به تغییر زبان
-    val currentLocale = LocaleManagerCompat.getApplicationLocales(context).toLanguageTags()
+    val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags()
     val currentLanguageDisplay = when {
         currentLocale.startsWith("fa") -> "فارسی"
         currentLocale.startsWith("en") -> "English"
@@ -184,7 +186,7 @@ fun SettingsScreen(
                             lineHeight = (32 * scaleFactor).sp
                         )
                         Text(
-                            text = stringResource(id = R.string.settings_subtitle),
+                            text = "Warden VPN by ALIZ",
                             style = MaterialTheme.typography.bodySmall,
                             color = secondaryText,
                             fontSize = (13 * scaleFactor).sp,
@@ -363,7 +365,7 @@ fun SettingsScreen(
                 }
             }
 
-            // Application Logs & About Us (Moved to Bottom)
+            // Application Logs & About Us
             if (searchQuery.isEmpty() || "Application Logs System About Us Version".contains(searchQuery, ignoreCase = true)) {
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -378,7 +380,7 @@ fun SettingsScreen(
                             HorizontalDivider(color = dividerColor, thickness = 0.5.dp, modifier = Modifier.padding(start = 64.dp))
                             IosPresetItem(
                                 icon = Icons.Default.Info, iconBg = Color(0xFF8E8E93),
-                                title = stringResource(id = R.string.about_us), subtitle = stringResource(id = R.string.about_us_subtitle),
+                                title = stringResource(id = R.string.about_us), subtitle = "Warden VPN Core",
                                 isActive = false, onClick = onOpenAbout, scaleFactor = scaleFactor,
                                 textColor = primaryText, subTextColor = secondaryText
                             )
@@ -633,7 +635,6 @@ fun SettingsScreen(
                             Column(
                                 modifier = Modifier.fillMaxWidth().background(groupBg.copy(alpha = 0.4f)).padding((14 * scaleFactor).dp)
                             ) {
-                                var localIp by remember { mutableStateOf<String?>(null) }
                                 val clipboardManager = LocalClipboardManager.current
                                 val toastIpCopied = stringResource(id = R.string.toast_ip_copied)
                                 LaunchedEffect(Unit) { localIp = NetworkUtils.getLocalIpAddress() }
