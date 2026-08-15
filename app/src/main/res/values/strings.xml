@@ -1,4 +1,11 @@
 <resources>
+    <string name="app_name">Warden VPN</string>
+    <string name="widget_title">WARDEN</string>
+    <string name="widget_status_disconnected">Disconnected</string>
+    <string name="widget_button_desc">Toggle Connection</string>
+    <string name="proto_masque">MASQUE</string>
+    <string name="proto_wire">WIRE</string>
+    <string name="proto_gool">GOOL</string>
       <!-- Settings Screen -->
     <string name="settings_title">Settings</string>
     <string name="settings_subtitle">Configure engine protocols &amp; transport</string>
