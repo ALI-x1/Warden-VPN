@@ -9,6 +9,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import io.github.immaghzbad.aetherst.ui.theme.MyApplicationTheme
 import io.github.immaghzbad.aetherst.ui.AetherViewModel
@@ -24,7 +26,10 @@ class MainActivity : ComponentActivity() {
         val viewModel = AetherViewModel(applicationContext)
 
         setContent {
-            MyApplicationTheme {
+            // مدیریت استیت تم به صورت ایزوله و واکنشی در کامپوز
+            var isDarkTheme by rememberSaveable { mutableStateOf(true) }
+
+            MyApplicationTheme(darkTheme = isDarkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
