@@ -1,6 +1,7 @@
 package io.github.immaghzbad.aetherst
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,8 +16,26 @@ import androidx.compose.ui.Modifier
 import io.github.immaghzbad.aetherst.ui.theme.MyApplicationTheme
 import io.github.immaghzbad.aetherst.ui.AetherViewModel
 import io.github.immaghzbad.aetherst.ui.screens.MainScreen
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val lang = prefs.getString("app_lang", "") ?: ""
+        
+        val context = if (lang.isNotEmpty()) {
+            val locale = Locale(lang)
+            Locale.setDefault(locale)
+            val config = newBase.resources.configuration
+            config.setLocale(locale)
+            newBase.createConfigurationContext(config)
+        } else {
+            newBase
+        }
+        super.attachBaseContext(context)
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +45,6 @@ class MainActivity : ComponentActivity() {
         val viewModel = AetherViewModel(applicationContext)
 
         setContent {
-            // مدیریت استیت تم به صورت ایزوله و واکنشی در کامپوز
             var isDarkTheme by rememberSaveable { mutableStateOf(true) }
 
             MyApplicationTheme(darkTheme = isDarkTheme) {
