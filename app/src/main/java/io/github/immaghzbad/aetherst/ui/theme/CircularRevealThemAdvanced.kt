@@ -53,7 +53,6 @@ fun CircularRevealDashboard(
         }
     }
 
-    // بازاستفاده از شیء Path جهت جلوگیری از افت فریم
     val reusablePath = remember { Path() }
 
     Box(
@@ -62,12 +61,10 @@ fun CircularRevealDashboard(
             .onGloballyPositioned { screenSize = it.size }
     ) {
         if (isAnimating) {
-            // لایه زیرین: تم قبلی
-            MyApplicationTheme(darkTheme = previousIsDark) {
+            AetherTheme(darkTheme = previousIsDark) {
                 content(previousIsDark)
             }
 
-            // لایه رویین: تم جدید
             val currentRadius = maxRadius * progress
             Box(
                 modifier = Modifier
@@ -85,12 +82,12 @@ fun CircularRevealDashboard(
                         }
                     }
             ) {
-                MyApplicationTheme(darkTheme = targetIsDark) {
+                AetherTheme(darkTheme = targetIsDark) {
                     content(targetIsDark)
                 }
             }
         } else {
-            MyApplicationTheme(darkTheme = isDark) {
+            AetherTheme(darkTheme = isDark) {
                 content(isDark)
             }
         }
