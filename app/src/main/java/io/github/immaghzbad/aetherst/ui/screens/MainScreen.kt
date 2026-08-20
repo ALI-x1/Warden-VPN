@@ -77,7 +77,11 @@ private fun Context.isIgnoringBatteryOptimizations(): Boolean {
 
 @SuppressLint("BatteryLife")
 @Composable
-fun MainScreen(viewModel: AetherViewModel) {
+fun MainScreen(
+    viewModel: AetherViewModel,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
+) {
     val context = LocalContext.current
     val activity = context.findComponentActivity()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -181,7 +185,11 @@ fun MainScreen(viewModel: AetherViewModel) {
                 scaleFactor = scaleFactor
             )
         } else {
-            DashboardContent(viewModel)
+            DashboardContent(
+                viewModel = viewModel,
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme
+            )
         }
 
         IosToast(
@@ -194,7 +202,11 @@ fun MainScreen(viewModel: AetherViewModel) {
 
 @SuppressLint("BatteryLife")
 @Composable
-private fun DashboardContent(viewModel: AetherViewModel) {
+private fun DashboardContent(
+    viewModel: AetherViewModel,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
+) {
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
     var showSplitTunneling by remember { mutableStateOf(false) }
@@ -213,9 +225,6 @@ private fun DashboardContent(viewModel: AetherViewModel) {
     val isOptimizingMtu by viewModel.isOptimizingMtu.collectAsStateWithLifecycle()
     val isWaitingForLoginCode by viewModel.isWaitingForLoginCode.collectAsStateWithLifecycle()
     val scrollToZeroTrust by viewModel.scrollToZeroTrust.collectAsStateWithLifecycle()
-    
-    // تعریف isDarkTheme در اینجا تا به درستی درون DashboardScreen شناخته شود
-    val isDarkTheme = ThemeManager.currentTheme.isDark
 
     LaunchedEffect(scrollToZeroTrust) {
         if (scrollToZeroTrust) {
@@ -289,7 +298,7 @@ private fun DashboardContent(viewModel: AetherViewModel) {
                             ipInfo = ipInfo,
                             pingState = pingState,
                             isDarkTheme = isDarkTheme,
-                            onToggleTheme = { ThemeManager.toggleBrightness(context) },
+                            onToggleTheme = onToggleTheme,
                             onToggleVpn = { handleVpnToggle() },
                             onUpdateProtocol = { proto -> viewModel.updateConfig(config.copy(protocol = proto)) },
                             onOpenSettings = { selectedTab = 1 },
