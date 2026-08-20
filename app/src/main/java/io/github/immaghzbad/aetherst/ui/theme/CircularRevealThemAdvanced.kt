@@ -36,7 +36,7 @@ fun CircularRevealDashboard(
 
     val progress by animateFloatAsState(
         targetValue = if (isAnimating) 1f else 0f,
-        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
         label = "circular_reveal",
         finishedListener = {
             isAnimating = false
@@ -53,6 +53,9 @@ fun CircularRevealDashboard(
         }
     }
 
+    // بازاستفاده از شیء Path جهت جلوگیری از افت فریم
+    val reusablePath = remember { Path() }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -64,21 +67,20 @@ fun CircularRevealDashboard(
                 content(previousIsDark)
             }
 
-            // لایه رویین: تم جدید با برش دایره‌ای
+            // لایه رویین: تم جدید
             val currentRadius = maxRadius * progress
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .drawWithContent {
-                        val path = Path().apply {
-                            addOval(
-                                Rect(
-                                    center = revealOrigin,
-                                    radius = currentRadius
-                                )
+                        reusablePath.reset()
+                        reusablePath.addOval(
+                            Rect(
+                                center = revealOrigin,
+                                radius = currentRadius
                             )
-                        }
-                        clipPath(path) {
+                        )
+                        clipPath(reusablePath) {
                             this@drawWithContent.drawContent()
                         }
                     }
@@ -88,7 +90,6 @@ fun CircularRevealDashboard(
                 }
             }
         } else {
-            // حالت عادی بدون انیمیشن
             MyApplicationTheme(darkTheme = isDark) {
                 content(isDark)
             }
