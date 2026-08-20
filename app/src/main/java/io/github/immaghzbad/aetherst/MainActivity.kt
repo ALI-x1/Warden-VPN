@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import io.github.immaghzbad.aetherst.ui.theme.MyApplicationTheme
+import io.github.immaghzbad.aetherst.ui.theme.ThemeManager
 import io.github.immaghzbad.aetherst.ui.AetherViewModel
 import io.github.immaghzbad.aetherst.ui.screens.MainScreen
 import java.util.Locale
@@ -45,14 +46,24 @@ class MainActivity : ComponentActivity() {
         val viewModel = AetherViewModel(applicationContext)
 
         setContent {
-            var isDarkTheme by rememberSaveable { mutableStateOf(true) }
+            // بارگذاری اولیه از Preference
+            var isDarkTheme by rememberSaveable { 
+                mutableStateOf(ThemeManager.currentTheme.isDark) 
+            }
 
             MyApplicationTheme(darkTheme = isDarkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(viewModel = viewModel)
+                    MainScreen(
+                        viewModel = viewModel,
+                        isDarkTheme = isDarkTheme,
+                        onToggleTheme = {
+                            isDarkTheme = !isDarkTheme
+                            ThemeManager.toggleBrightness(this@MainActivity)
+                        }
+                    )
                 }
             }
         }
