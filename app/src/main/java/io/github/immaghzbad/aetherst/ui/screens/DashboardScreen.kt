@@ -48,8 +48,8 @@ import androidx.compose.ui.unit.sp
 import io.github.immaghzbad.aetherst.data.IpInfo
 import io.github.immaghzbad.aetherst.data.PingState
 import io.github.immaghzbad.aetherst.model.*
-import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
 import io.github.immaghzbad.aetherst.ui.theme.CircularRevealDashboard
+import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -72,7 +72,6 @@ fun DashboardScreen(
     bottomContentPadding: Dp = 0.dp
 ) {
     var showProxyOverlay by remember { mutableStateOf(true) }
-    // مقدار اولیه پیش‌فرض مرکز دکمه در بالای سمت راست صفحه (به جای 0,0)
     var toggleButtonCenter by remember { mutableStateOf(Offset(800f, 150f)) }
 
     LaunchedEffect(connectionStatus) {
@@ -138,7 +137,6 @@ fun DashboardScreen(
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             
-                            // دکمه تغییر تم با محاسبه مختصات دقیق
                             ThemeToggleButton(
                                 isDarkTheme = currentIsDark,
                                 onToggleTheme = onToggleTheme,
@@ -163,7 +161,6 @@ fun DashboardScreen(
                                 Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
                             }
                             
-                            // دکمه تنظیمات با هاله محو شونده
                             val themeColor = MaterialTheme.colorScheme.primary
                             val settingsRotation = remember { Animatable(0f) }
                             val scope = rememberCoroutineScope()
@@ -339,11 +336,33 @@ fun ThemeToggleButton(
         )
     }
 
-    val sunAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 0f else 1f, animationSpec = tween(400), label = "sunAlpha")
-    val sunScale by animateFloatAsState(targetValue = if (isDarkTheme) 0.3f else 1f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "sunScale")
+    val iconRotation by animateFloatAsState(
+        targetValue = if (isDarkTheme) 360f else 0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+        label = "iconRotation"
+    )
 
-    val moonAlpha by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0f, animationSpec = tween(400), label = "moonAlpha")
-    val moonScale by animateFloatAsState(targetValue = if (isDarkTheme) 1f else 0.3f, animationSpec = tween(600, easing = FastOutSlowInEasing), label = "moonScale")
+    val sunAlpha by animateFloatAsState(
+        targetValue = if (isDarkTheme) 0f else 1f,
+        animationSpec = tween(350, easing = FastOutSlowInEasing),
+        label = "sunAlpha"
+    )
+    val sunScale by animateFloatAsState(
+        targetValue = if (isDarkTheme) 0.2f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "sunScale"
+    )
+
+    val moonAlpha by animateFloatAsState(
+        targetValue = if (isDarkTheme) 1f else 0f,
+        animationSpec = tween(350, easing = FastOutSlowInEasing),
+        label = "moonAlpha"
+    )
+    val moonScale by animateFloatAsState(
+        targetValue = if (isDarkTheme) 1f else 0.2f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "moonScale"
+    )
 
     IconButton(
         onClick = onToggleTheme,
@@ -360,18 +379,23 @@ fun ThemeToggleButton(
                 onCenterCalculated(center)
             }
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Canvas(modifier = Modifier.size((22 * scaleFactor).dp)) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size((22 * scaleFactor).dp)
+                .graphicsLayer { rotationZ = iconRotation }
+        ) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
                 val center = Offset(size.width / 2f, size.height / 2f)
-                
-                if (!isDarkTheme || sunAlpha > 0f) {
+
+                if (sunAlpha > 0f) {
                     for (angle in 0 until 360 step 45) {
                         rotate(angle.toFloat(), center) {
                             drawLine(
                                 color = themeColor.copy(alpha = sunAlpha),
-                                start = Offset(center.x, 2f),
-                                end = Offset(center.x, 6f),
-                                strokeWidth = 2.dp.toPx(),
+                                start = Offset(center.x, 1.5f * sunScale),
+                                end = Offset(center.x, 5.5f * sunScale),
+                                strokeWidth = 2.dp.toPx() * sunScale,
                                 cap = StrokeCap.Round
                             )
                         }
@@ -384,13 +408,13 @@ fun ThemeToggleButton(
                     )
                 }
 
-                if (isDarkTheme || moonAlpha > 0f) {
+                if (moonAlpha > 0f) {
                     val moonRadius = 7.dp.toPx() * moonScale
-                    
+
                     val path1 = Path().apply {
                         addOval(Rect(center.x - moonRadius, center.y - moonRadius, center.x + moonRadius, center.y + moonRadius))
                     }
-                    
+
                     val maskOffset = 3.5.dp.toPx() * moonScale
                     val path2 = Path().apply {
                         addOval(Rect(
@@ -400,11 +424,11 @@ fun ThemeToggleButton(
                             center.y + moonRadius - maskOffset
                         ))
                     }
-                    
+
                     val crescentPath = Path().apply {
                         op(path1, path2, PathOperation.Difference)
                     }
-                    
+
                     drawPath(
                         path = crescentPath,
                         color = themeColor,
