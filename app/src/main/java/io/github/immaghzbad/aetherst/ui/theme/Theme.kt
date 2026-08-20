@@ -2,6 +2,8 @@ package io.github.immaghzbad.aetherst.ui.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -20,7 +22,7 @@ fun MyApplicationTheme(
 
     // خواندن پلت رنگی بر اساس وضعیت darkTheme پاس‌داده‌شده
     val appTheme = if (darkTheme) AppTheme.Dark else AppTheme.Light
-    val colorScheme = appTheme.colorScheme
+    val materialColorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -39,7 +41,7 @@ fun MyApplicationTheme(
         LocalAppTheme provides appTheme
     ) {
         MaterialTheme(
-            colorScheme = colorScheme,
+            colorScheme = materialColorScheme,
             typography = Typography,
             content = content
         )
