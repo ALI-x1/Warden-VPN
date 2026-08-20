@@ -88,10 +88,10 @@ fun SettingsScreen(
     var showLanguageSheet by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
     
-    // انتقال استیت IP به بالا برای جلوگیری از پاک شدن هنگام اسکرول کردن لیست
+    // وضعیت استیت IP برای جلوگیری از پاک شدن هنگام اسکرول
     var localIp by remember { mutableStateOf<String?>(null) }
 
-    // توابع و متغیرهای مربوط به تغییر زبان
+    // توابع و متغیرهای تغییر زبان
     val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags()
     val currentLanguageDisplay = when {
         currentLocale.startsWith("fa") -> "فارسی"
@@ -107,13 +107,12 @@ fun SettingsScreen(
         }
         AppCompatDelegate.setApplicationLocales(localeList)
         
-        // رفرش کردن اکتیویتی برای اعمال قطعی زبان در ComponentActivity برای نسخه‌های قدیمی‌تر اندروید
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
             (context as? android.app.Activity)?.recreate()
         }
     }
 
-    // اتصال رنگ‌ها به تم اصلی متریال دیزاین
+    // اتصال رنگ‌ها به تم اصلی Material Design 3
     val bgColor = MaterialTheme.colorScheme.background
     val cardBg = MaterialTheme.colorScheme.surface
     val groupBg = MaterialTheme.colorScheme.surfaceVariant
@@ -1199,7 +1198,7 @@ private fun IosInputFieldRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
