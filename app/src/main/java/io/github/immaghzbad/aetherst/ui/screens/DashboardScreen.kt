@@ -72,7 +72,8 @@ fun DashboardScreen(
     bottomContentPadding: Dp = 0.dp
 ) {
     var showProxyOverlay by remember { mutableStateOf(true) }
-    var toggleButtonCenter by remember { mutableStateOf(Offset.Zero) }
+    // مقدار اولیه پیش‌فرض مرکز دکمه در بالای سمت راست صفحه (به جای 0,0)
+    var toggleButtonCenter by remember { mutableStateOf(Offset(800f, 150f)) }
 
     LaunchedEffect(connectionStatus) {
         if (connectionStatus != ConnectionStatus.RUNNING) {
@@ -84,7 +85,7 @@ fun DashboardScreen(
         isDark = isDarkTheme,
         revealOrigin = toggleButtonCenter,
         modifier = Modifier.fillMaxSize()
-    ) {
+    ) { currentIsDark ->
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
@@ -139,7 +140,7 @@ fun DashboardScreen(
                             
                             // دکمه تغییر تم با محاسبه مختصات دقیق
                             ThemeToggleButton(
-                                isDarkTheme = isDarkTheme,
+                                isDarkTheme = currentIsDark,
                                 onToggleTheme = onToggleTheme,
                                 scaleFactor = scaleFactor,
                                 onCenterCalculated = { center -> toggleButtonCenter = center }
@@ -185,7 +186,7 @@ fun DashboardScreen(
                                 },
                                 modifier = Modifier
                                     .size((36 * scaleFactor).dp)
-                                    .background(settingsHaloBrush) // استفاده از براش شعاعی بدون لبه تیز
+                                    .background(settingsHaloBrush)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
@@ -833,7 +834,6 @@ fun WardenPowerButton(
         label = "iconScale"
     )
     
-    // ضربان بسیار نرم هنگام اتصال
     val heartbeatPulse by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = if (isRunning) 1.03f else 1f,
@@ -943,7 +943,7 @@ fun WardenPowerButton(
                 modifier = Modifier
                     .size(coreRingSize)
                     .graphicsLayer {
-                        scaleX = heartbeatPulse // اعمال ضربان هنگام اتصال
+                        scaleX = heartbeatPulse
                         scaleY = heartbeatPulse
                     }
                     .clip(CircleShape)
