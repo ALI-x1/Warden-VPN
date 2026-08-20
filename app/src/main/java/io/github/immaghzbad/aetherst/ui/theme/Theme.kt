@@ -2,8 +2,6 @@ package io.github.immaghzbad.aetherst.ui.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -15,14 +13,13 @@ import androidx.core.view.WindowCompat
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = ThemeManager.currentTheme.isDark,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-
-    // خواندن پلت رنگی بر اساس وضعیت darkTheme پاس‌داده‌شده
-    val appTheme = if (darkTheme) AppTheme.Dark else AppTheme.Light
-    val materialColorScheme = if (darkTheme) darkColorScheme() else lightColorScheme()
+    
+    // دریافت تم فعال بر اساس تنظیمات ThemeManager
+    val activeTheme = ThemeManager.currentTheme
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -30,18 +27,18 @@ fun MyApplicationTheme(
             val activity = view.context as? Activity ?: context as? Activity
             activity?.window?.let { window ->
                 val insetsController = WindowCompat.getInsetsController(window, view)
-                insetsController.isAppearanceLightStatusBars = !darkTheme
-                insetsController.isAppearanceLightNavigationBars = !darkTheme
+                insetsController.isAppearanceLightStatusBars = !activeTheme.isDark
+                insetsController.isAppearanceLightNavigationBars = !activeTheme.isDark
             }
         }
     }
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Ltr,
-        LocalAppTheme provides appTheme
+        LocalAppTheme provides activeTheme
     ) {
         MaterialTheme(
-            colorScheme = materialColorScheme,
+            colorScheme = activeTheme.colorScheme,
             typography = Typography,
             content = content
         )
