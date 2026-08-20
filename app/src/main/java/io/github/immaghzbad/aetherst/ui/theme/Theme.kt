@@ -13,15 +13,13 @@ import androidx.core.view.WindowCompat
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
 
-    // خواندن تم ذخیره‌شده قبل از رندر اولیه
-    ThemeManager.init(context)
-
-    val appTheme = ThemeManager.currentTheme
+    // خواندن پلت رنگی بر اساس وضعیت darkTheme پاس‌داده‌شده
+    val appTheme = if (darkTheme) AppTheme.Dark else AppTheme.Light
     val colorScheme = appTheme.colorScheme
 
     val view = LocalView.current
@@ -30,8 +28,8 @@ fun MyApplicationTheme(
             val activity = view.context as? Activity ?: context as? Activity
             activity?.window?.let { window ->
                 val insetsController = WindowCompat.getInsetsController(window, view)
-                insetsController.isAppearanceLightStatusBars = !appTheme.isDark
-                insetsController.isAppearanceLightNavigationBars = !appTheme.isDark
+                insetsController.isAppearanceLightStatusBars = !darkTheme
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }
