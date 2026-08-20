@@ -1,95 +1,47 @@
 package io.github.immaghzbad.aetherst.ui.theme
 
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.IntSize
-import kotlin.math.hypot
+import android.app.Activity
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.core.view.WindowCompat
 
 @Composable
-fun CircularRevealDashboard(
-    isDark: Boolean,
-    revealOrigin: Offset,
-    modifier: Modifier = Modifier,
-    content: @Composable (isDarkForContent: Boolean) -> Unit
+fun MyApplicationTheme(
+    darkTheme: Boolean = true,
+    content: @Composable () -> Unit
 ) {
-    var screenSize by remember { mutableStateOf(IntSize.Zero) }
-    var previousIsDark by remember { mutableStateOf(isDark) }
-    var targetIsDark by remember { mutableStateOf(isDark) }
-    var isAnimating by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    LaunchedEffect(isDark) {
-        if (isDark != targetIsDark) {
-            previousIsDark = targetIsDark
-            targetIsDark = isDark
-            isAnimating = true
+    // خواندن پلت رنگی بر اساس وضعیت darkTheme پاس‌داده‌شده
+    val appTheme = if (darkTheme) AppTheme.Dark else AppTheme.Light
+    val colorScheme = appTheme.colorScheme
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val activity = view.context as? Activity ?: context as? Activity
+            activity?.window?.let { window ->
+                val insetsController = WindowCompat.getInsetsController(window, view)
+                insetsController.isAppearanceLightStatusBars = !darkTheme
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
+            }
         }
     }
 
-    val progress by animateFloatAsState(
-        targetValue = if (isAnimating) 1f else 0f,
-        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
-        label = "circular_reveal",
-        finishedListener = {
-            isAnimating = false
-            previousIsDark = targetIsDark
-        }
-    )
-
-    val maxRadius = remember(screenSize, revealOrigin) {
-        if (screenSize == IntSize.Zero) 1000f
-        else {
-            val maxDx = maxOf(revealOrigin.x, screenSize.width - revealOrigin.x)
-            val maxDy = maxOf(revealOrigin.y, screenSize.height - revealOrigin.y)
-            hypot(maxDx.toDouble(), maxDy.toDouble()).toFloat()
-        }
-    }
-
-    val reusablePath = remember { Path() }
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .onGloballyPositioned { screenSize = it.size }
+    CompositionLocalProvider(
+        LocalLayoutDirection provides LayoutDirection.Ltr,
+        LocalAppTheme provides appTheme
     ) {
-        if (isAnimating) {
-            MyApplicationTheme(darkTheme = previousIsDark) {
-                content(previousIsDark)
-            }
-
-            val currentRadius = maxRadius * progress
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawWithContent {
-                        reusablePath.reset()
-                        reusablePath.addOval(
-                            Rect(
-                                center = revealOrigin,
-                                radius = currentRadius
-                            )
-                        )
-                        clipPath(reusablePath) {
-                            this@drawWithContent.drawContent()
-                        }
-                    }
-            ) {
-                MyApplicationTheme(darkTheme = targetIsDark) {
-                    content(targetIsDark)
-                }
-            }
-        } else {
-            MyApplicationTheme(darkTheme = isDark) {
-                content(isDark)
-            }
-        }
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
     }
 }
