@@ -61,7 +61,7 @@ fun CircularRevealDashboard(
             .onGloballyPositioned { screenSize = it.size }
     ) {
         if (isAnimating) {
-            AetherTheme(darkTheme = previousIsDark) {
+            MyApplicationTheme(darkTheme = previousIsDark) {
                 content(previousIsDark)
             }
 
@@ -82,12 +82,12 @@ fun CircularRevealDashboard(
                         }
                     }
             ) {
-                AetherTheme(darkTheme = targetIsDark) {
+                MyApplicationTheme(darkTheme = targetIsDark) {
                     content(targetIsDark)
                 }
             }
         } else {
-            AetherTheme(darkTheme = isDark) {
+            MyApplicationTheme(darkTheme = isDark) {
                 content(isDark)
             }
         }
