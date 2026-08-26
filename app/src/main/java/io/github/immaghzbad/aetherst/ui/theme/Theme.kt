@@ -18,7 +18,19 @@ fun MyApplicationTheme(
 ) {
     val context = LocalContext.current
 
-    val appTheme = if (darkTheme) AppTheme.Dark else AppTheme.Light
+    val current = ThemeManager.currentTheme
+    val appTheme = if (current.isDark == darkTheme) {
+        current
+    } else {
+        val currentPrefix = if (current.isDark) "dark-" else "light-"
+        val targetPrefix = if (darkTheme) "dark-" else "light-"
+        val colorName = current.id.removePrefix(currentPrefix)
+        val targetId = "$targetPrefix$colorName"
+        AppThemes.find { it.id == targetId }
+            ?: AppThemes.firstOrNull { it.isDark == darkTheme }
+            ?: current
+    }
+
     val colorScheme = appTheme.colorScheme
 
     val view = LocalView.current
