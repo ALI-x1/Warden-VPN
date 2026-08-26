@@ -37,7 +37,6 @@ fun OnboardingScreen(
     onRequestBatteryOptimization: () -> Unit,
     onFinish: () -> Unit
 ) {
-    // آیدی تلگرام خود را اینجا وارد کنید (بدون @)
     val telegramUsername = "Ali_jahangirr"
     val uriHandler = LocalUriHandler.current
 
@@ -63,7 +62,6 @@ fun OnboardingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // دکمه اصلی LET'S GO
                 Button(
                     onClick = onFinish,
                     modifier = Modifier
@@ -86,7 +84,6 @@ fun OnboardingScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // دکمه تلگرام شیک آبی
                 Button(
                     onClick = {
                         val cleanUsername = telegramUsername.removePrefix("@")
@@ -97,13 +94,13 @@ fun OnboardingScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF229ED9), // آبی استاندارد تلگرام
+                        containerColor = Color(0xFF229ED9),
                         contentColor = Color.White
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterHorizontally,
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(
@@ -122,7 +119,6 @@ fun OnboardingScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // نمایش آیدی تلگرام زیر دکمه
                 Text(
                     text = "@${telegramUsername.removePrefix("@")}",
                     style = MaterialTheme.typography.labelMedium,
