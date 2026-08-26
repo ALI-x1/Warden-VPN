@@ -98,14 +98,10 @@ fun MainScreen(
     val onboardingState by onboardingViewModel.state.collectAsStateWithLifecycle()
     val updateInfo by viewModel.updateInfo.collectAsStateWithLifecycle()
     val crashLog by viewModel.crashLog.collectAsStateWithLifecycle()
-    val currentStep by rememberUpdatedState(onboardingState.currentStep)
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                if (currentStep == OnboardingStep.BATTERY_OPTIMIZATION && context.isIgnoringBatteryOptimizations()) {
-                    onboardingViewModel.moveToNextStep()
-                }
                 viewModel.checkBatteryOptimizationStatus()
             }
         }
@@ -130,47 +126,16 @@ fun MainScreen(
         val scaleFactor = (screenWidth.value / 411f).coerceIn(0.7f, 1.1f)
 
         if (!isOnboardingComplete) {
-            val vpnLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                val intent = VpnService.prepare(context)
-                if (intent == null) onboardingViewModel.moveToNextStep()
-            }
-            val notifLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) onboardingViewModel.moveToNextStep() else onboardingViewModel.showNotificationError()
-            }
-
             OnboardingScreen(
                 state = onboardingState,
-                onGetStarted = { onboardingViewModel.moveToNextStep() },
+                onGetStarted = { onboardingViewModel.completeOnboardingDirectly() },
                 onRetryRegistration = { onboardingViewModel.startProtocolTests() },
                 onCancelRegistration = { onboardingViewModel.cancelTests() },
                 onUpdateScanMode = { onboardingViewModel.updateScanMode(it) },
-                onRequestVpnPermission = {
-                    val intent = VpnService.prepare(context)
-                    if (intent != null) vpnLauncher.launch(intent) else onboardingViewModel.moveToNextStep()
-                },
-                onRequestNotificationPermission = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        onboardingViewModel.moveToNextStep()
-                    }
-                },
-                onRequestBatteryOptimization = {
-                    if (context.isIgnoringBatteryOptimizations()) {
-                        onboardingViewModel.moveToNextStep()
-                    } else {
-                        runCatching {
-                            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                                data = "package:${context.packageName}".toUri()
-                            }
-                            context.startActivity(intent)
-                        }.onFailure {
-                            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                            context.startActivity(intent)
-                        }
-                    }
-                },
-                onFinish = onboardingViewModel::moveToNextStep
+                onRequestVpnPermission = {},
+                onRequestNotificationPermission = {},
+                onRequestBatteryOptimization = {},
+                onFinish = { onboardingViewModel.completeOnboardingDirectly() }
             )
         } else if (crashLog != null) {
             CrashReportScreen(
@@ -246,7 +211,7 @@ private fun DashboardContent(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (!isGranted) {
-            viewModel.showToast("Notification permission required", true)
+            viewModel.showToast("Notification permission required for tunnel status", true)
         }
     }
 
@@ -255,11 +220,15 @@ private fun DashboardContent(
             val notifGranted = ContextCompat.checkSelfPermission(
                 context, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-            if (!notifGranted) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (!notifGranted) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
         }
         viewModel.toggleVpn(context) {
             val intent = VpnService.prepare(context)
-            if (intent != null) vpnPermissionLauncher.launch(intent)
+            if (intent != null) {
+                vpnPermissionLauncher.launch(intent)
+            }
         }
     }
 
