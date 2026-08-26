@@ -38,7 +38,7 @@ fun OnboardingScreen(
     onFinish: () -> Unit
 ) {
     // آیدی تلگرام خود را اینجا وارد کنید (بدون @)
-    val telegramUsername = "YourTelegramID"
+    val telegramUsername = "Ali_jahangirr"
     val uriHandler = LocalUriHandler.current
 
     Box(
