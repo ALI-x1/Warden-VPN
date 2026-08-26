@@ -126,14 +126,14 @@ fun LogsScreen(
             ) {
                 Column {
                     Text(
-                        text = "AetherST Logs",
+                        text = "Warden VPN Logs",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
                         fontSize = (26 * scaleFactor).sp
                     )
                     Text(
-                        text = "Live Aether Core Logs",
+                        text = "Live Warden Core Logs",
                         style = MaterialTheme.typography.bodySmall,
                         color = IosSecondaryLabel,
                         fontSize = (11 * scaleFactor).sp
@@ -315,11 +315,11 @@ fun LogsScreen(
                             .padding((10 * scaleFactor).dp)
                     ) {
                         items(
-                        items = filteredLogs.distinctBy { it.id },
-                        key = { it.id }
-                    ) { entry ->
-                        IosLogLineItem(entry = entry, onShowToast = onShowToast, scaleFactor = scaleFactor)
-                    }
+                            items = filteredLogs.distinctBy { it.id },
+                            key = { it.id }
+                        ) { entry ->
+                            IosLogLineItem(entry = entry, onShowToast = onShowToast, scaleFactor = scaleFactor)
+                        }
                     }
                 }
             }
