@@ -44,10 +44,7 @@ private val IosCardBg = Color(0xFF1C1C1E)
 private val IosActiveBlue = Color(0xFF007AFF)
 private val IosActiveGreen = Color(0xFF34C759)
 private val IosSecondaryLabel = Color(0xFF8E8E93)
-private const val UserGithubUrl = "https://github.com/immaghzbad"
-private const val AetherRepositoryUrl = "https://github.com/CluvexStudio/Aether"
-private const val HevRepositoryUrl = "https://github.com/heiher/hev-socks5-tunnel"
-private const val DeveloperTelegramUrl = "https://t.me/PowerSigma"
+private const val DeveloperTelegramUrl = "https://t.me/Ali_jahangirr"
 
 @Composable
 fun AboutUsScreen(
@@ -78,7 +75,7 @@ fun AboutUsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "About AetherST",
+                        text = "About Warden VPN",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
@@ -96,7 +93,7 @@ fun AboutUsScreen(
                     scaleFactor = scaleFactor
                 ) {
                     Text(
-                        text = "AetherST is a native Android client for the Aether tunnel ecosystem. It handles the heavy lifting of managing advanced protocols through a clean interface with real-time stats and simple configuration presets.",
+                        text = "Warden VPN is a native Android client for the Warden tunnel ecosystem. It handles the heavy lifting of managing advanced protocols through a clean interface with real-time stats and simple configuration presets.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = IosSecondaryLabel,
                         lineHeight = (22 * scaleFactor).sp,
@@ -108,11 +105,11 @@ fun AboutUsScreen(
                 AboutInfoCard(
                     icon = Icons.Default.Shield,
                     iconColor = IosActiveGreen,
-                    title = "The Aether Core",
+                    title = "The Warden Core",
                     scaleFactor = scaleFactor
                 ) {
                     Text(
-                        text = "Aether is an open-source proxy core built for stability in restricted networks. It uses dynamic gateway discovery, traffic obfuscation, and multiple transport layers to keep connections reliable and stealthy.",
+                        text = "Warden is an open-source proxy core built for stability in restricted networks. It uses dynamic gateway discovery, traffic obfuscation, and multiple transport layers to keep connections reliable and stealthy.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = IosSecondaryLabel,
                         lineHeight = (22 * scaleFactor).sp,
@@ -133,7 +130,7 @@ fun AboutUsScreen(
                     scaleFactor = scaleFactor
                 ) {
                     Text(
-                        text = "The HEV engine is a specialized SOCKS5 tunnel that bridges Android's TUN interface with the Aether core. Written in C, it provides a high-performance native network stack with minimal overhead, reducing battery and CPU usage.",
+                        text = "The HEV engine is a specialized SOCKS5 tunnel that bridges Android's TUN interface with the Warden core. Written in C, it provides a high-performance native network stack with minimal overhead, reducing battery and CPU usage.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = IosSecondaryLabel,
                         lineHeight = (22 * scaleFactor).sp,
@@ -169,21 +166,12 @@ fun AboutUsScreen(
                 AboutInfoCard(
                     icon = Icons.Default.Code,
                     iconColor = IosActiveBlue,
-                    title = "Dev Links & Source",
+                    title = "Dev Links & Contact",
                     scaleFactor = scaleFactor
                 ) {
                     AboutLinkCard(
-                        title = "Project Maintainer",
-                        subtitle = "Where I push my code and track new features.",
-                        url = UserGithubUrl,
-                        urlColor = Color.White,
-                        onClick = { uriHandler.openUri(UserGithubUrl) },
-                        scaleFactor = scaleFactor
-                    )
-                    Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
-                    AboutLinkCard(
-                        title = "Telegram Channel",
-                        subtitle = "Telegram channel for support, chat, and dev updates.",
+                        title = "Developer Telegram",
+                        subtitle = "Contact the developer directly on Telegram.",
                         url = DeveloperTelegramUrl,
                         urlColor = Color(0xFF2AABEE),
                         onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
@@ -191,20 +179,29 @@ fun AboutUsScreen(
                     )
                     Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
                     AboutLinkCard(
-                        title = "Aether Repository",
-                        subtitle = "The engine's source code and protocol implementation.",
-                        url = AetherRepositoryUrl,
-                        urlColor = IosActiveBlue,
-                        onClick = { uriHandler.openUri(AetherRepositoryUrl) },
+                        title = "Telegram Channel",
+                        subtitle = "Official Telegram channel for support and updates.",
+                        url = DeveloperTelegramUrl,
+                        urlColor = Color(0xFF2AABEE),
+                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
                         scaleFactor = scaleFactor
                     )
                     Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
                     AboutLinkCard(
-                        title = "HEV Stack Source",
-                        subtitle = "Native C implementation of the TUN-to-SOCKS bridge.",
-                        url = HevRepositoryUrl,
-                        urlColor = Color(0xFFAF52DE),
-                        onClick = { uriHandler.openUri(HevRepositoryUrl) },
+                        title = "Warden Community",
+                        subtitle = "Join our community group for questions and chat.",
+                        url = DeveloperTelegramUrl,
+                        urlColor = Color(0xFF2AABEE),
+                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
+                        scaleFactor = scaleFactor
+                    )
+                    Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
+                    AboutLinkCard(
+                        title = "Support & Feedback",
+                        subtitle = "Report issues or send feature suggestions.",
+                        url = DeveloperTelegramUrl,
+                        urlColor = Color(0xFF2AABEE),
+                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
                         scaleFactor = scaleFactor
                     )
                 }
@@ -222,11 +219,11 @@ fun AboutUsScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(text = "Built with ", color = IosSecondaryLabel, fontSize = (13 * scaleFactor).sp)
                             Icon(imageVector = Icons.Default.Favorite, contentDescription = null, tint = Color(0xFFFF375F), modifier = Modifier.size((16 * scaleFactor).dp))
-                            Text(text = " by PowerSigma Team", color = IosSecondaryLabel, fontSize = (13 * scaleFactor).sp)
+                            Text(text = " Made by Ali", color = IosSecondaryLabel, fontSize = (13 * scaleFactor).sp)
                         }
                         Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
                         Text(
-                            text = "AetherST is an independent client project. Aether core is developed by CluvexStudio and distributed under its own open-source license.",
+                            text = "Warden VPN is an independent client project designed for secure and reliable networking.",
                             style = MaterialTheme.typography.bodySmall,
                             color = IosSecondaryLabel,
                             textAlign = TextAlign.Center,
@@ -266,7 +263,7 @@ private fun AboutHero(scaleFactor: Float = 1f) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "AetherST",
+                    text = "Warden VPN",
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.White,
@@ -294,7 +291,7 @@ private fun AboutHero(scaleFactor: Float = 1f) {
                     ) {
                         VersionText(label = "App", value = "1.4.2", color = IosActiveBlue, scaleFactor = scaleFactor)
                         Text("•", color = Color.White.copy(alpha = 0.2f), fontSize = (12 * scaleFactor).sp)
-                        VersionText(label = "Aether", value = "1.5.0", color = IosActiveGreen, scaleFactor = scaleFactor)
+                        VersionText(label = "Warden", value = "1.5.0", color = IosActiveGreen, scaleFactor = scaleFactor)
                         Text("•", color = Color.White.copy(alpha = 0.2f), fontSize = (12 * scaleFactor).sp)
                         VersionText(label = "Hev", value = "2.15.0", color = Color(0xFFAF52DE), scaleFactor = scaleFactor)
                     }
