@@ -85,7 +85,7 @@ class AetherViewModel(context: Context) : ViewModel() {
     init {
         LogRepository.initialize(appContext)
         loadInstalledApps()
-        checkForUpdates()
+        // checkForUpdates()
         observeConnectionStatus()
         checkBatteryOptimizationStatus()
         checkLastCrash()
@@ -686,42 +686,7 @@ class AetherViewModel(context: Context) : ViewModel() {
     }.getOrDefault(false)
 
     private fun checkForUpdates() {
-        viewModelScope.launch {
-            try {
-                val info = withContext(Dispatchers.IO) {
-                    val request = okhttp3.Request.Builder()
-                        .url("https://raw.githubusercontent.com/immaghzbad/AetherST/refs/heads/main/update.json")
-                        .build()
-
-                    io.github.immaghzbad.aetherst.core.NetworkClient.instance.newCall(request).execute().use { response ->
-                        if (response.isSuccessful) {
-                            val jsonStr = response.body?.string() ?: return@withContext null
-                            val json = JSONObject(jsonStr)
-
-                            UpdateInfo(
-                                version = json.getString("version"),
-                                versionCode = json.getInt("version_code"),
-                                isBeta = json.getBoolean("is_beta"),
-                                changelog = json.getString("changelog"),
-                                releaseUrl = json.getString("release_url")
-                            )
-                        } else {
-                            null
-                        }
-                    }
-                }
-
-                if (info != null) {
-                    val currentVersion = BuildConfig.VERSION_NAME
-
-                    if (info.version != currentVersion) {
-                        _updateInfo.value = info
-                    }
-                }
-            } catch (e: Exception) {
-                LogRepository.w("Update check failed: ${e.localizedMessage}")
-            }
-        }
+        _updateInfo.value = null
     }
 
     fun dismissUpdate() {
