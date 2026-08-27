@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
@@ -17,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,8 +36,6 @@ fun OnboardingScreen(
     onRequestBatteryOptimization: () -> Unit,
     onFinish: () -> Unit
 ) {
-    var showCommunityStep by remember { mutableStateOf(false) }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,39 +56,30 @@ fun OnboardingScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AnimatedContent(
-                    targetState = if (showCommunityStep) "COMMUNITY" else state.currentStep.name,
+                    targetState = state.currentStep,
                     transitionSpec = {
                         fadeIn(animationSpec = tween(400)) togetherWith fadeOut(animationSpec = tween(400))
                     },
                     label = "step_transition"
-                ) { stepName ->
-                    if (stepName == "COMMUNITY") {
-                        CommunityStep(onFinish = onFinish)
-                    } else {
-                        when (state.currentStep) {
-                            OnboardingStep.WELCOME -> WelcomeStep(onGetStarted)
-                            OnboardingStep.PROTOCOL_TEST -> ProtocolTestStep(
-                                state,
-                                onRetryRegistration,
-                                onCancelRegistration,
-                                onUpdateScanMode,
-                                onContinue = { showCommunityStep = true }
-                            )
-                            OnboardingStep.SUCCESS -> SuccessStep(onContinue = { showCommunityStep = true })
-                            else -> {
-                                LaunchedEffect(Unit) {
-                                    showCommunityStep = true
-                                }
-                            }
-                        }
+                ) { step ->
+                    when (step) {
+                        OnboardingStep.WELCOME -> WelcomeStep(onGetStarted)
+                        OnboardingStep.PROTOCOL_TEST -> ProtocolTestStep(
+                            state,
+                            onRetryRegistration,
+                            onCancelRegistration,
+                            onUpdateScanMode,
+                            onFinish
+                        )
+                        OnboardingStep.VPN_PERMISSION -> VpnPermissionStep(onRequestVpnPermission)
+                        OnboardingStep.NOTIFICATION_PERMISSION -> NotificationPermissionStep(state, onRequestNotificationPermission)
+                        OnboardingStep.SUCCESS -> SuccessStep(onFinish)
+                        else -> Box(Modifier.fillMaxSize())
                     }
                 }
             }
 
-            OnboardingFooter(
-                currentStep = state.currentStep,
-                showCommunityStep = showCommunityStep
-            )
+            OnboardingFooter(state.currentStep)
         }
     }
 }
@@ -177,9 +164,7 @@ private fun WelcomeStep(onGetStarted: () -> Unit) {
         Spacer(modifier = Modifier.height(48.dp))
         Button(
             onClick = onGetStarted,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -253,9 +238,7 @@ private fun ProtocolTestStep(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text("Cancel Test", fontWeight = FontWeight.Bold)
@@ -263,9 +246,7 @@ private fun ProtocolTestStep(
         } else if (allDone && anySuccess) {
             Button(
                 onClick = onContinue,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = appTheme.connected,
@@ -277,9 +258,7 @@ private fun ProtocolTestStep(
         } else {
             Button(
                 onClick = onStart,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -301,9 +280,7 @@ private fun SelectorLabel() {
         text = "SCAN MODE",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 4.dp, bottom = 8.dp)
+        modifier = Modifier.fillMaxWidth().padding(start = 4.dp, bottom = 8.dp)
     )
 }
 
@@ -392,7 +369,70 @@ private fun ProtocolRow(name: String, status: ProtocolTestStatus, isActive: Bool
 }
 
 @Composable
-private fun SuccessStep(onContinue: () -> Unit) {
+private fun VpnPermissionStep(onRequest: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Allow VPN Access", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Warden VPN needs VPN permission to create a secure tunnel. Your current connection remains untouched for now.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = onRequest,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Text("Allow Access", fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+private fun NotificationPermissionStep(state: OnboardingState, onRequest: () -> Unit) {
+    val appTheme = LocalAppTheme.current
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Stay Informed", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Enable notifications to see tunnel status and important updates.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = onRequest,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) {
+            Text("Enable Notifications", fontWeight = FontWeight.Bold)
+        }
+        if (state.error != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = state.error,
+                color = appTheme.error,
+                fontSize = 13.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Composable
+private fun SuccessStep(onFinish: () -> Unit) {
     val appTheme = LocalAppTheme.current
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(Icons.Default.CheckCircle, null, tint = appTheme.connected, modifier = Modifier.size(80.dp))
@@ -400,137 +440,54 @@ private fun SuccessStep(onContinue: () -> Unit) {
         Text("Setup Complete", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Warden VPN is ready to protect your connection. Proceed to finalize setup.",
+            text = "Warden VPN is ready to protect your connection. You can now enter the dashboard and start the tunnel.",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(48.dp))
         Button(
-            onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
+            onClick = onFinish,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = appTheme.connected,
                 contentColor = Color.White
             )
         ) {
-            Text("Next", fontWeight = FontWeight.Bold)
+            Text("Start Secure Journey", fontWeight = FontWeight.Bold)
         }
     }
 }
 
 @Composable
-private fun CommunityStep(onFinish: () -> Unit) {
-    val uriHandler = LocalUriHandler.current
-    val telegramUsername = "Ali_jahangirr"
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "Join Our Community",
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Stay updated with our latest updates and support channel.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(36.dp))
-
-        Button(
-            onClick = onFinish,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) {
-            Text("LET'S GO", fontWeight = FontWeight.Bold, fontSize = 18.sp, letterSpacing = 1.sp)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                val cleanUsername = telegramUsername.removePrefix("@")
-                uriHandler.openUri("https://t.me/$cleanUsername")
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF229ED9),
-                contentColor = Color.White
-            )
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Telegram ID",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun OnboardingFooter(
-    currentStep: OnboardingStep,
-    showCommunityStep: Boolean
-) {
-    val totalSteps = 4
-    val currentIndex = when {
-        showCommunityStep -> 3
-        currentStep == OnboardingStep.WELCOME -> 0
-        currentStep == OnboardingStep.PROTOCOL_TEST -> 1
-        else -> 2
-    }
-
+private fun OnboardingFooter(currentStep: OnboardingStep) {
     Row(
         modifier = Modifier.padding(bottom = 32.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        for (i in 0 until totalSteps) {
-            val isSelected = i == currentIndex
-            val width by animateDpAsState(
-                targetValue = if (isSelected) 24.dp else 8.dp,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-                label = "indicator_width"
-            )
-            val color by animateColorAsState(
-                targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                animationSpec = tween(400),
-                label = "indicator_color"
-            )
+        OnboardingStep.entries
+            .filter { it != OnboardingStep.COMPLETED && it != OnboardingStep.BATTERY_OPTIMIZATION }
+            .forEach { step ->
+                val isSelected = step == currentStep
+                val width by animateDpAsState(
+                    targetValue = if (isSelected) 24.dp else 8.dp,
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+                    label = "indicator_width"
+                )
+                val color by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    animationSpec = tween(400),
+                    label = "indicator_color"
+                )
 
-            Box(
-                modifier = Modifier
-                    .height(8.dp)
-                    .width(width)
-                    .clip(CircleShape)
-                    .background(color)
-            )
-        }
+                Box(
+                    modifier = Modifier
+                        .height(8.dp)
+                        .width(width)
+                        .clip(CircleShape)
+                        .background(color)
+                )
+            }
     }
 }
