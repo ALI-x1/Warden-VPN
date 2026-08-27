@@ -43,19 +43,15 @@ class OnboardingViewModel(context: Context) : ViewModel() {
 
     fun moveToNextStep() {
         val nextStep = when (_state.value.currentStep) {
-            OnboardingStep.WELCOME -> OnboardingStep.COMPLETED
-            OnboardingStep.PROTOCOL_TEST -> OnboardingStep.COMPLETED
-            OnboardingStep.VPN_PERMISSION -> OnboardingStep.COMPLETED
-            OnboardingStep.NOTIFICATION_PERMISSION -> OnboardingStep.COMPLETED
-            OnboardingStep.BATTERY_OPTIMIZATION -> OnboardingStep.COMPLETED
+            OnboardingStep.WELCOME -> OnboardingStep.PROTOCOL_TEST
+            OnboardingStep.PROTOCOL_TEST -> OnboardingStep.VPN_PERMISSION
+            OnboardingStep.VPN_PERMISSION -> OnboardingStep.NOTIFICATION_PERMISSION
+            OnboardingStep.NOTIFICATION_PERMISSION -> OnboardingStep.SUCCESS
+            OnboardingStep.BATTERY_OPTIMIZATION -> OnboardingStep.SUCCESS
             OnboardingStep.SUCCESS -> OnboardingStep.COMPLETED
             OnboardingStep.COMPLETED -> OnboardingStep.COMPLETED
         }
         updateStep(nextStep)
-    }
-
-    fun completeOnboardingDirectly() {
-        updateStep(OnboardingStep.COMPLETED)
     }
 
     fun showNotificationError() {
