@@ -54,7 +54,6 @@ class OnboardingViewModel(context: Context) : ViewModel() {
         updateStep(nextStep)
     }
 
-    // متد جدید جهت اتمام مستقیم آنبوردینگ
     fun completeOnboardingDirectly() {
         updateStep(OnboardingStep.COMPLETED)
     }
@@ -74,6 +73,9 @@ class OnboardingViewModel(context: Context) : ViewModel() {
     fun startProtocolTests() {
         if (_state.value.isProcessing) return
         val sessionId = currentSessionId.incrementAndGet()
+
+        // تغییر وضعیت استپ به صفحه تست پروتکل هنگام شروع تست
+        updateStep(OnboardingStep.PROTOCOL_TEST)
 
         _state.value = _state.value.copy(
             isProcessing = true,
