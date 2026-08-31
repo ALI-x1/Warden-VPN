@@ -54,6 +54,11 @@ class OnboardingViewModel(context: Context) : ViewModel() {
         updateStep(nextStep)
     }
 
+    // متد جدید جهت اتمام مستقیم آنبوردینگ
+    fun completeOnboardingDirectly() {
+        updateStep(OnboardingStep.COMPLETED)
+    }
+
     fun showNotificationError() {
         _state.value = _state.value.copy(error = "Notification permission is required for app quality and tunnel status updates.")
     }
