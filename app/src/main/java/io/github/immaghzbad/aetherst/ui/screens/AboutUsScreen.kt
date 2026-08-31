@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -169,41 +170,41 @@ fun AboutUsScreen(
                     title = "Dev Links & Contact",
                     scaleFactor = scaleFactor
                 ) {
-                    AboutLinkCard(
-                        title = "Developer Telegram",
-                        subtitle = "Contact the developer directly on Telegram.",
-                        url = DeveloperTelegramUrl,
-                        urlColor = Color(0xFF2AABEE),
-                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
-                        scaleFactor = scaleFactor
+                    Text(
+                        text = "For support, feedback, and latest channel updates:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = IosSecondaryLabel,
+                        fontSize = (13 * scaleFactor).sp
                     )
-                    Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
-                    AboutLinkCard(
-                        title = "Telegram Channel",
-                        subtitle = "Official Telegram channel for support and updates.",
-                        url = DeveloperTelegramUrl,
-                        urlColor = Color(0xFF2AABEE),
+                    Spacer(modifier = Modifier.height((14 * scaleFactor).dp))
+                    Button(
                         onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
-                        scaleFactor = scaleFactor
-                    )
-                    Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
-                    AboutLinkCard(
-                        title = "Warden Community",
-                        subtitle = "Join our community group for questions and chat.",
-                        url = DeveloperTelegramUrl,
-                        urlColor = Color(0xFF2AABEE),
-                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
-                        scaleFactor = scaleFactor
-                    )
-                    Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
-                    AboutLinkCard(
-                        title = "Support & Feedback",
-                        subtitle = "Report issues or send feature suggestions.",
-                        url = DeveloperTelegramUrl,
-                        urlColor = Color(0xFF2AABEE),
-                        onClick = { uriHandler.openUri(DeveloperTelegramUrl) },
-                        scaleFactor = scaleFactor
-                    )
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height((52 * scaleFactor).dp),
+                        shape = RoundedCornerShape((14 * scaleFactor).dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF229ED9),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Send,
+                                contentDescription = null,
+                                modifier = Modifier.size((20 * scaleFactor).dp)
+                            )
+                            Spacer(modifier = Modifier.width((10 * scaleFactor).dp))
+                            Text(
+                                text = "تلگرام آیدی",
+                                fontSize = (16 * scaleFactor).sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
             item {
@@ -349,22 +350,6 @@ private fun FeatureRow(icon: ImageVector, title: String, description: String, sc
         Column {
             Text(text = title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = Color.White, fontSize = (14 * scaleFactor).sp)
             Text(text = description, style = MaterialTheme.typography.bodySmall, color = IosSecondaryLabel, lineHeight = (18 * scaleFactor).sp, fontSize = (12 * scaleFactor).sp)
-        }
-    }
-}
-
-@Composable
-private fun AboutLinkCard(title: String, subtitle: String, url: String, urlColor: Color, onClick: () -> Unit, scaleFactor: Float = 1f) {
-    Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        shape = RoundedCornerShape((16 * scaleFactor).dp),
-        colors = CardDefaults.cardColors(containerColor = IosCardBg)
-    ) {
-        Column(modifier = Modifier.padding(horizontal = (18 * scaleFactor).dp, vertical = (14 * scaleFactor).dp)) {
-            Text(text = title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold, color = Color.White, fontSize = (15 * scaleFactor).sp)
-            Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = IosSecondaryLabel, fontSize = (12 * scaleFactor).sp)
-            Spacer(modifier = Modifier.height((4 * scaleFactor).dp))
-            Text(text = url, style = MaterialTheme.typography.labelSmall, color = urlColor, maxLines = 1, fontSize = (10 * scaleFactor).sp)
         }
     }
 }
