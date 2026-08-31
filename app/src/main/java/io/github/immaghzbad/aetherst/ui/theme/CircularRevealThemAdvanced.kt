@@ -17,39 +17,49 @@ import kotlin.math.hypot
 @Composable
 fun CircularRevealDashboard(
     isDark: Boolean,
-    revealOrigin: Offset,
+    revealOrigin: Offset? = null,
     modifier: Modifier = Modifier,
     content: @Composable (isDarkForContent: Boolean) -> Unit
 ) {
     var screenSize by remember { mutableStateOf(IntSize.Zero) }
+    
     var previousIsDark by remember { mutableStateOf(isDark) }
-    var targetIsDark by remember { mutableStateOf(isDark) }
+    var currentIsDark by remember { mutableStateOf(isDark) }
     var isAnimating by remember { mutableStateOf(false) }
 
+    val animProgress = remember { Animatable(0f) }
+
     LaunchedEffect(isDark) {
-        if (isDark != targetIsDark) {
-            previousIsDark = targetIsDark
-            targetIsDark = isDark
+        if (isDark != currentIsDark) {
+            previousIsDark = currentIsDark
+            currentIsDark = isDark
             isAnimating = true
+            animProgress.snapTo(0f)
+            animProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing)
+            )
+            isAnimating = false
+            previousIsDark = currentIsDark
         }
     }
 
-    val progress by animateFloatAsState(
-        targetValue = if (isAnimating) 1f else 0f,
-        animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
-        label = "circular_reveal",
-        finishedListener = {
-            isAnimating = false
-            previousIsDark = targetIsDark
+    // نقطه شروع انیمیشن (در صورت عدم ارسال، پیش‌فرض روی سمت راست بالای صفحه یعنی محل دکمه تم قرار می‌گیرد)
+    val actualOrigin = remember(revealOrigin, screenSize) {
+        revealOrigin ?: if (screenSize != IntSize.Zero) {
+            Offset(screenSize.width * 0.85f, screenSize.height * 0.07f)
+        } else {
+            Offset.Zero
         }
-    )
+    }
 
-    val maxRadius = remember(screenSize, revealOrigin) {
-        if (screenSize == IntSize.Zero) 1000f
+    // محاسبه دقیق قطر صفحه تا دایره ۱۰۰٪ تمام گوشه‌ها را پوشش دهد
+    val maxRadius = remember(screenSize, actualOrigin) {
+        if (screenSize == IntSize.Zero) 3500f
         else {
-            val maxDx = maxOf(revealOrigin.x, screenSize.width - revealOrigin.x)
-            val maxDy = maxOf(revealOrigin.y, screenSize.height - revealOrigin.y)
-            hypot(maxDx.toDouble(), maxDy.toDouble()).toFloat()
+            val maxDx = maxOf(actualOrigin.x, screenSize.width - actualOrigin.x)
+            val maxDy = maxOf(actualOrigin.y, screenSize.height - actualOrigin.y)
+            hypot(maxDx.toDouble(), maxDy.toDouble()).toFloat() * 1.05f
         }
     }
 
@@ -60,12 +70,15 @@ fun CircularRevealDashboard(
             .fillMaxSize()
             .onGloballyPositioned { screenSize = it.size }
     ) {
-        if (isAnimating) {
-            MyApplicationTheme(darkTheme = previousIsDark) {
-                content(previousIsDark)
-            }
+        // لایه پایه (تم قبلی یا تم جاری هنگام عدم اجرای انیمیشن)
+        MyApplicationTheme(darkTheme = if (isAnimating) previousIsDark else currentIsDark) {
+            content(if (isAnimating) previousIsDark else currentIsDark)
+        }
 
-            val currentRadius = maxRadius * progress
+        // لایه رویی (تم جدید که به شکل دایره بزرگ می‌شود)
+        if (isAnimating) {
+            val currentRadius = maxRadius * animProgress.value
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -73,7 +86,7 @@ fun CircularRevealDashboard(
                         reusablePath.reset()
                         reusablePath.addOval(
                             Rect(
-                                center = revealOrigin,
+                                center = actualOrigin,
                                 radius = currentRadius
                             )
                         )
@@ -82,13 +95,9 @@ fun CircularRevealDashboard(
                         }
                     }
             ) {
-                MyApplicationTheme(darkTheme = targetIsDark) {
-                    content(targetIsDark)
+                MyApplicationTheme(darkTheme = currentIsDark) {
+                    content(currentIsDark)
                 }
-            }
-        } else {
-            MyApplicationTheme(darkTheme = isDark) {
-                content(isDark)
             }
         }
     }
