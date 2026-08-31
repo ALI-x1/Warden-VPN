@@ -128,7 +128,7 @@ fun MainScreen(
         if (!isOnboardingComplete) {
             OnboardingScreen(
                 state = onboardingState,
-                onGetStarted = { onboardingViewModel.completeOnboardingDirectly() },
+                onGetStarted = { onboardingViewModel.startProtocolTests() },
                 onRetryRegistration = { onboardingViewModel.startProtocolTests() },
                 onCancelRegistration = { onboardingViewModel.cancelTests() },
                 onUpdateScanMode = { onboardingViewModel.updateScanMode(it) },
