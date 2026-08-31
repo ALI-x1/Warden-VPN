@@ -132,9 +132,9 @@ fun MainScreen(
                 onRetryRegistration = { onboardingViewModel.startProtocolTests() },
                 onCancelRegistration = { onboardingViewModel.cancelTests() },
                 onUpdateScanMode = { onboardingViewModel.updateScanMode(it) },
-                onRequestVpnPermission = {},
-                onRequestNotificationPermission = {},
-                onRequestBatteryOptimization = {},
+                onRequestVpnPermission = { onboardingViewModel.moveToNextStep() },
+                onRequestNotificationPermission = { onboardingViewModel.moveToNextStep() },
+                onRequestBatteryOptimization = { onboardingViewModel.moveToNextStep() },
                 onFinish = { onboardingViewModel.completeOnboardingDirectly() }
             )
         } else if (crashLog != null) {
