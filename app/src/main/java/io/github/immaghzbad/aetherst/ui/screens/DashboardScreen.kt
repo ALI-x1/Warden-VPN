@@ -50,6 +50,7 @@ import io.github.immaghzbad.aetherst.data.PingState
 import io.github.immaghzbad.aetherst.model.*
 import io.github.immaghzbad.aetherst.ui.theme.CircularRevealDashboard
 import io.github.immaghzbad.aetherst.ui.theme.LocalAppTheme
+import io.github.immaghzbad.aetherst.ui.theme.ThemeManager
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -61,7 +62,7 @@ fun DashboardScreen(
     sessionTraffic: SessionTraffic,
     ipInfo: IpInfo = IpInfo(),
     pingState: PingState = PingState(),
-    isDarkTheme: Boolean,
+    isDarkTheme: Boolean = ThemeManager.currentTheme.isDark,
     onToggleTheme: () -> Unit,
     onToggleVpn: () -> Unit,
     onUpdateProtocol: (AetherProtocol) -> Unit,
@@ -138,7 +139,7 @@ fun DashboardScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             
                             ThemeToggleButton(
-                                isDarkTheme = currentIsDark,
+                                isDarkTheme = isDarkTheme,
                                 onToggleTheme = onToggleTheme,
                                 scaleFactor = scaleFactor,
                                 onCenterCalculated = { center -> toggleButtonCenter = center }
