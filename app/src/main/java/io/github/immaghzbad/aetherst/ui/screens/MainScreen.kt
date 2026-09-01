@@ -79,7 +79,7 @@ private fun Context.isIgnoringBatteryOptimizations(): Boolean {
 @Composable
 fun MainScreen(
     viewModel: AetherViewModel,
-    isDarkTheme: Boolean,
+    isDarkTheme: Boolean = ThemeManager.currentTheme.isDark,
     onToggleTheme: () -> Unit
 ) {
     val context = LocalContext.current
@@ -152,7 +152,7 @@ fun MainScreen(
         } else {
             DashboardContent(
                 viewModel = viewModel,
-                isDarkTheme = isDarkTheme,
+                isDarkTheme = ThemeManager.currentTheme.isDark,
                 onToggleTheme = onToggleTheme
             )
         }
@@ -266,8 +266,12 @@ private fun DashboardContent(
                             sessionTraffic = sessionTraffic,
                             ipInfo = ipInfo,
                             pingState = pingState,
-                            isDarkTheme = isDarkTheme,
-                            onToggleTheme = onToggleTheme,
+                            isDarkTheme = ThemeManager.currentTheme.isDark,
+                            onToggleTheme = {
+                                val targetId = if (ThemeManager.currentTheme.isDark) "light-default" else "dark-default"
+                                ThemeManager.setTheme(context, targetId)
+                                onToggleTheme()
+                            },
                             onToggleVpn = { handleVpnToggle() },
                             onUpdateProtocol = { proto -> viewModel.updateConfig(config.copy(protocol = proto)) },
                             onOpenSettings = { selectedTab = 1 },
